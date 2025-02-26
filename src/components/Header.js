@@ -1,41 +1,72 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCog, FaUser, FaMoon, FaSun, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSun, FaMoon, FaBars, FaTimes, FaBell, FaCog, FaUser } from 'react-icons/fa';
 import '../styles/Header.css';
 
-const Header = ({ isDarkTheme, toggleTheme, isLoggedIn, handleLogout }) => {
+const Header = ({ theme, toggleTheme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
-    <header className={`header ${isDarkTheme ? 'dark' : 'light'}`}>
-      <nav>
-        <div className="logo animate-bounce">
-          <Link to="/">TaxBuddy</Link>
-        </div>
-        
-        <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-          <Link to="/" className="nav-link-animate">Home</Link>
-          <Link to="/chat" className="nav-link-animate">Chat</Link>
-          <Link to="/about" className="nav-link-animate">About</Link>
-        </div>
+    <header className="header">
+      <div className="header-left">
+        <Link to="/" className="logo" onClick={closeMenu}>
+          TaxBuddy
+        </Link>
+      </div>
 
-        <div className="mobile-menu" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <FaTimes /> : <FaBars />}
-        </div>
+      <button className="mobile-menu-button" onClick={toggleMenu} aria-label="Toggle menu">
+        {isMenuOpen ? <FaTimes /> : <FaBars />}
+      </button>
 
-        <div className="nav-icons">
-          <button onClick={toggleTheme} className="icon-animate">
-            {isDarkTheme ? <FaSun /> : <FaMoon />}
-          </button>
-          <Link to="/settings" className="icon-animate"><FaCog /></Link>
-          <Link to="/profile" className="icon-animate"><FaUser /></Link>
-          {isLoggedIn ? (
-            <button onClick={handleLogout} className="auth-button">Logout</button>
-          ) : (
-            <Link to="/login" className="auth-button">Login</Link>
-          )}
-        </div>
+      <nav className={`header-center ${isMenuOpen ? 'active' : ''}`}>
+        <Link to="/" className="nav-link" onClick={closeMenu}>
+          Home
+        </Link>
+        <Link to="/chat" className="nav-link" onClick={closeMenu}>
+          Chat
+        </Link>
+        <Link to="/learn" className="nav-link" onClick={closeMenu}>
+          Learn
+        </Link>
+        <Link to="/about" className="nav-link" onClick={closeMenu}>
+          About
+        </Link>
       </nav>
+
+      <div className="header-right">
+        <div className={`nav-items ${isMenuOpen ? 'active' : ''}`}>
+          <div className="icon-group" style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'light' ? <FaMoon size={16} /> : <FaSun size={16} />}
+            </button>
+            <Link to="/notifications" className="nav-link" onClick={closeMenu}>
+              <FaBell size={16} />
+            </Link>
+            <Link to="/settings" className="nav-link" onClick={closeMenu}>
+              <FaCog size={16} />
+            </Link>
+            <Link to="/profile" className="nav-link" onClick={closeMenu}>
+              <FaUser size={16} />
+            </Link>
+          </div>
+          <div className="auth-group" style={{ display: 'flex', gap: '0.5rem' }}>
+            <Link to="/login" className="auth-link" onClick={closeMenu}>
+              Login
+            </Link>
+            <Link to="/signup" className="auth-link signup-btn" onClick={closeMenu}>
+              Sign Up
+            </Link>
+          </div>
+        </div>
+      </div>
     </header>
   );
 };
