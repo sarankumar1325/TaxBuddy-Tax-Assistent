@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  FaUser, FaBell, FaShieldAlt, FaFileAlt, FaCreditCard, FaLanguage,
-  FaWallet, FaMoon, FaDatabase, FaQuestionCircle, FaUserCog, FaChartBar,
-  FaDownload, FaHeadset, FaGlobe, FaPalette, FaBook, FaUserCircle
+  FaUser, FaBell, FaShieldAlt, FaFileAlt, FaPalette, FaDatabase, FaHeadset, FaBook, FaQuestionCircle
 } from 'react-icons/fa';
 import '../styles/Setting.css';
 
@@ -14,39 +12,24 @@ const Settings = () => {
       incomeSources: ['salary'],
       taxSavingGoals: ['maximize_deductions'],
       filingMethod: 'assisted',
-      region: 'IN',
-      taxYear: '2024'
+      region: 'IN'
     },
     notifications: {
       filingReminders: true,
       lawUpdates: true,
-      refundAlerts: true,
-      securityAlerts: true,
-      monthlySummary: true
+      refundAlerts: true
     },
     display: {
       theme: 'light',
-      chartType: 'bar',
-      fontSize: 'medium',
-      currency: 'INR',
       language: 'English'
     },
     security: {
       twoFactorAuth: false,
-      sessionTimeout: '30',
-      dataBackup: true,
-      loginAlerts: true
+      sessionTimeout: '30'
     },
     privacy: {
       dataRetention: '12months',
-      dataSharing: false,
-      newsletter: true,
-      marketing: false
-    },
-    account: {
-      username: '',
-      email: '',
-      password: ''
+      dataSharing: false
     }
   });
 
@@ -56,11 +39,9 @@ const Settings = () => {
     { id: 'display', icon: <FaPalette />, label: 'Display' },
     { id: 'security', icon: <FaShieldAlt />, label: 'Security' },
     { id: 'privacy', icon: <FaDatabase />, label: 'Privacy' },
-    { id: 'help', icon: <FaHeadset />, label: 'Help & Support' },
-    { id: 'account', icon: <FaUserCircle />, label: 'Account' }
+    { id: 'help', icon: <FaHeadset />, label: 'Help & Support' }
   ];
 
-  // Handler for settings changes
   const handleSettingChange = (category, setting, value) => {
     setSettings(prev => ({
       ...prev,
@@ -140,10 +121,25 @@ const Settings = () => {
             onChange={(e) => handleSettingChange('taxPreferences', 'region', e.target.value)}
           >
             <option value="IN">India</option>
-            <option value="IN-KA">Karnataka</option>
-            <option value="IN-MH">Maharashtra</option>
-            <option value="IN-DL">Delhi</option>
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="GB">United Kingdom</option>
+            <option value="AU">Australia</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="JP">Japan</option>
+            <option value="CN">China</option>
+            <option value="BR">Brazil</option>
+            <option value="others">Others</option>
           </select>
+          {settings.taxPreferences.region === 'others' && (
+            <input
+              type="text"
+              placeholder="Enter your region"
+              value={settings.taxPreferences.customRegion || ''}
+              onChange={(e) => handleSettingChange('taxPreferences', 'customRegion', e.target.value)}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -155,47 +151,38 @@ const Settings = () => {
       <div className="settings-options">
         <div className="settings-option">
           <label>Tax Filing Reminders</label>
-          <input
-            type="checkbox"
-            checked={settings.notifications.filingReminders}
-            onChange={(e) => handleSettingChange('notifications', 'filingReminders', e.target.checked)}
-          />
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={settings.notifications.filingReminders}
+              onChange={(e) => handleSettingChange('notifications', 'filingReminders', e.target.checked)}
+            />
+            <span className="slider"></span>
+          </label>
         </div>
 
         <div className="settings-option">
           <label>Tax Law Updates</label>
-          <input
-            type="checkbox"
-            checked={settings.notifications.lawUpdates}
-            onChange={(e) => handleSettingChange('notifications', 'lawUpdates', e.target.checked)}
-          />
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={settings.notifications.lawUpdates}
+              onChange={(e) => handleSettingChange('notifications', 'lawUpdates', e.target.checked)}
+            />
+            <span className="slider"></span>
+          </label>
         </div>
 
         <div className="settings-option">
           <label>Refund Status Alerts</label>
-          <input
-            type="checkbox"
-            checked={settings.notifications.refundAlerts}
-            onChange={(e) => handleSettingChange('notifications', 'refundAlerts', e.target.checked)}
-          />
-        </div>
-
-        <div className="settings-option">
-          <label>Security Alerts</label>
-          <input
-            type="checkbox"
-            checked={settings.notifications.securityAlerts}
-            onChange={(e) => handleSettingChange('notifications', 'securityAlerts', e.target.checked)}
-          />
-        </div>
-
-        <div className="settings-option">
-          <label>Monthly Tax Summary</label>
-          <input
-            type="checkbox"
-            checked={settings.notifications.monthlySummary}
-            onChange={(e) => handleSettingChange('notifications', 'monthlySummary', e.target.checked)}
-          />
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={settings.notifications.refundAlerts}
+              onChange={(e) => handleSettingChange('notifications', 'refundAlerts', e.target.checked)}
+            />
+            <span className="slider"></span>
+          </label>
         </div>
       </div>
     </div>
@@ -218,38 +205,12 @@ const Settings = () => {
         </div>
 
         <div className="settings-option">
-          <label>Chart Type</label>
-          <select
-            value={settings.display.chartType}
-            onChange={(e) => handleSettingChange('display', 'chartType', e.target.value)}
-          >
-            <option value="bar">Bar Chart</option>
-            <option value="pie">Pie Chart</option>
-            <option value="line">Line Chart</option>
-          </select>
-        </div>
-
-        <div className="settings-option">
-          <label>Font Size</label>
-          <select
-            value={settings.display.fontSize}
-            onChange={(e) => handleSettingChange('display', 'fontSize', e.target.value)}
-          >
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-          </select>
-        </div>
-
-        <div className="settings-option">
           <label>Language</label>
           <select
             value={settings.display.language}
             onChange={(e) => handleSettingChange('display', 'language', e.target.value)}
           >
             <option value="English">English</option>
-            <option value="Hindi">Hindi</option>
-            <option value="Kannada">Kannada</option>
           </select>
         </div>
       </div>
@@ -262,11 +223,14 @@ const Settings = () => {
       <div className="settings-options">
         <div className="settings-option">
           <label>Two-Factor Authentication</label>
-          <input
-            type="checkbox"
-            checked={settings.security.twoFactorAuth}
-            onChange={(e) => handleSettingChange('security', 'twoFactorAuth', e.target.checked)}
-          />
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={settings.security.twoFactorAuth}
+              onChange={(e) => handleSettingChange('security', 'twoFactorAuth', e.target.checked)}
+            />
+            <span className="slider"></span>
+          </label>
         </div>
 
         <div className="settings-option">
@@ -279,20 +243,6 @@ const Settings = () => {
             <option value="30">30 minutes</option>
             <option value="60">1 hour</option>
           </select>
-        </div>
-
-        <div className="settings-option">
-          <label>Login Alerts</label>
-          <input
-            type="checkbox"
-            checked={settings.security.loginAlerts}
-            onChange={(e) => handleSettingChange('security', 'loginAlerts', e.target.checked)}
-          />
-        </div>
-
-        <div className="danger-zone">
-          <h4>Danger Zone</h4>
-          <button className="danger-button">Delete Account</button>
         </div>
       </div>
     </div>
@@ -316,24 +266,14 @@ const Settings = () => {
         </div>
         <div className="settings-option">
           <label>Data Sharing</label>
-          <input
-            type="checkbox"
-            checked={settings.privacy.dataSharing}
-            onChange={(e) => handleSettingChange('privacy', 'dataSharing', e.target.checked)}
-          />
-        </div>
-        <div className="settings-option">
-          <label>Newsletter Subscription</label>
-          <input
-            type="checkbox"
-            checked={settings.privacy.newsletter}
-            onChange={(e) => handleSettingChange('privacy', 'newsletter', e.target.checked)}
-          />
-        </div>
-        <div className="danger-zone">
-          <h4>Data Management</h4>
-          <button className="danger-button">Download My Data</button>
-          <button className="danger-button">Delete All Data</button>
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={settings.privacy.dataSharing}
+              onChange={(e) => handleSettingChange('privacy', 'dataSharing', e.target.checked)}
+            />
+            <span className="slider"></span>
+          </label>
         </div>
       </div>
     </div>
@@ -344,56 +284,44 @@ const Settings = () => {
       <h3>Help & Support</h3>
       <div className="help-grid">
         <div className="help-card">
-          <FaBook className="help-icon" />
-          <h4>Documentation</h4>
-          <p>Browse our comprehensive guides and tutorials</p>
-          <button className="settings-button">View Docs</button>
-        </div>
-        <div className="help-card">
           <FaHeadset className="help-icon" />
           <h4>Contact Support</h4>
-          <p>Get help from our support team</p>
-          <button className="settings-button">Contact Us</button>
+          <p>Get assistance from our dedicated support team 24/7</p>
+          <button className="help-button primary">
+            <FaHeadset />
+            <span>Chat with Support</span>
+          </button>
+          <button className="help-button secondary">
+            <FaUser />
+            <span>Schedule a Call</span>
+          </button>
+        </div>
+        <div className="help-card">
+          <FaBook className="help-icon" />
+          <h4>Documentation</h4>
+          <p>Learn about tax filing processes and best practices</p>
+          <button className="help-button primary">
+            <FaBook />
+            <span>Read Guides</span>
+          </button>
+          <button className="help-button secondary">
+            <FaFileAlt />
+            <span>View Tutorials</span>
+          </button>
         </div>
         <div className="help-card">
           <FaQuestionCircle className="help-icon" />
           <h4>FAQs</h4>
-          <p>Find answers to common questions</p>
-          <button className="settings-button">View FAQs</button>
+          <p>Quick answers to common tax-related questions</p>
+          <button className="help-button primary">
+            <FaQuestionCircle />
+            <span>Browse FAQs</span>
+          </button>
+          <button className="help-button secondary">
+            <FaDatabase />
+            <span>Knowledge Base</span>
+          </button>
         </div>
-      </div>
-    </div>
-  );
-
-  const renderAccount = () => (
-    <div className="account-section">
-      <h3>Account Settings</h3>
-      <div className="account-options">
-        <div className="account-option">
-          <label>Username</label>
-          <input
-            type="text"
-            value={settings.account.username}
-            onChange={(e) => handleSettingChange('account', 'username', e.target.value)}
-          />
-        </div>
-        <div className="account-option">
-          <label>Email</label>
-          <input
-            type="email"
-            value={settings.account.email}
-            onChange={(e) => handleSettingChange('account', 'email', e.target.value)}
-          />
-        </div>
-        <div className="account-option">
-          <label>Password</label>
-          <input
-            type="password"
-            value={settings.account.password}
-            onChange={(e) => handleSettingChange('account', 'password', e.target.value)}
-          />
-        </div>
-        <button className="account-button">Update Account</button>
       </div>
     </div>
   );
@@ -424,7 +352,6 @@ const Settings = () => {
           {activeTab === 'security' && renderSecurity()}
           {activeTab === 'privacy' && renderPrivacy()}
           {activeTab === 'help' && renderHelp()}
-          {activeTab === 'account' && renderAccount()}
         </div>
       </div>
     </div>
