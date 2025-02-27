@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   FaUser, FaBell, FaShieldAlt, FaFileAlt, FaCreditCard, FaLanguage,
   FaWallet, FaMoon, FaDatabase, FaQuestionCircle, FaUserCog, FaChartBar,
-  FaDownload, FaHeadset, FaGlobe, FaPalette, FaBook
+  FaDownload, FaHeadset, FaGlobe, FaPalette, FaBook, FaUserCircle
 } from 'react-icons/fa';
 import '../styles/Setting.css';
 
@@ -42,6 +42,11 @@ const Settings = () => {
       dataSharing: false,
       newsletter: true,
       marketing: false
+    },
+    account: {
+      username: '',
+      email: '',
+      password: ''
     }
   });
 
@@ -51,7 +56,8 @@ const Settings = () => {
     { id: 'display', icon: <FaPalette />, label: 'Display' },
     { id: 'security', icon: <FaShieldAlt />, label: 'Security' },
     { id: 'privacy', icon: <FaDatabase />, label: 'Privacy' },
-    { id: 'help', icon: <FaHeadset />, label: 'Help & Support' }
+    { id: 'help', icon: <FaHeadset />, label: 'Help & Support' },
+    { id: 'account', icon: <FaUserCircle />, label: 'Account' }
   ];
 
   // Handler for settings changes
@@ -359,6 +365,39 @@ const Settings = () => {
     </div>
   );
 
+  const renderAccount = () => (
+    <div className="account-section">
+      <h3>Account Settings</h3>
+      <div className="account-options">
+        <div className="account-option">
+          <label>Username</label>
+          <input
+            type="text"
+            value={settings.account.username}
+            onChange={(e) => handleSettingChange('account', 'username', e.target.value)}
+          />
+        </div>
+        <div className="account-option">
+          <label>Email</label>
+          <input
+            type="email"
+            value={settings.account.email}
+            onChange={(e) => handleSettingChange('account', 'email', e.target.value)}
+          />
+        </div>
+        <div className="account-option">
+          <label>Password</label>
+          <input
+            type="password"
+            value={settings.account.password}
+            onChange={(e) => handleSettingChange('account', 'password', e.target.value)}
+          />
+        </div>
+        <button className="account-button">Update Account</button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="settings-wrapper">
       <div className="settings-container">
@@ -385,6 +424,7 @@ const Settings = () => {
           {activeTab === 'security' && renderSecurity()}
           {activeTab === 'privacy' && renderPrivacy()}
           {activeTab === 'help' && renderHelp()}
+          {activeTab === 'account' && renderAccount()}
         </div>
       </div>
     </div>
