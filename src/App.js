@@ -12,6 +12,8 @@ import SignUp from './pages/Auth/SignUp';
 import Learn from './pages/Learn';
 import Notifications from './pages/Notifications';
 import Social from './pages/Social';
+import TaxMentor from './pages/TaxMentor';
+import SecondBrain from './pages/SecondBrain';
 import './App.css';
 
 const AppContent = () => {
@@ -46,6 +48,8 @@ const AppContent = () => {
           <Route path="/signup" element={<SignUp setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/social" element={<Social />} />
+          <Route path="/tax-mentor" element={<TaxMentor />} />
+          <Route path="/second-brain" element={<SecondBrain />} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

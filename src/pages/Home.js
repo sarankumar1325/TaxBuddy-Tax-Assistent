@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaRobot, FaChartLine, FaBook, FaBell, FaArrowRight, FaHome, FaComments, FaGraduationCap, FaBuilding, FaCog, FaUser } from 'react-icons/fa';
+import { 
+  FaRobot, FaChartLine, FaBook, FaBell, FaArrowRight, 
+  FaBrain, FaGraduationCap, // Add these icons
+  FaHome, FaComments, FaBuilding, FaCog, FaUser 
+} from 'react-icons/fa';
 import { Line, Doughnut, Pie, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -35,10 +39,6 @@ const Home = () => {
     savings: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
-        label: 'Your Tax Savings',
-        data: [1200, 1900, 2400, 2800, 3200, 4200].map(val => val * 80), // Converting to approximate rupees
-        borderColor: '#10B981',
-        tension: 0.4,
         fill: true,
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
       }]
@@ -77,20 +77,19 @@ const Home = () => {
       datasets: [
         {
           label: 'Your Tax Liability',
-          data: [5500, 4200, 3800, 2800], // Updated with higher unique values
+          data: [4125, 4125, 4125, 4125],
           backgroundColor: '#F472B6',
         },
         {
           label: 'Amount Paid',
-          data: [5500, 4200, 3800, 0], // Updated to match liability except Q4
+          data: [4125, 4125, 4125, 0],
           backgroundColor: '#60A5FA',
         }
       ]
     }
   }), []);
 
-  // Separate options for line and bar charts
-  const lineBarOptions = React.useMemo(() => ({
+  const chartOptions = React.useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -99,92 +98,25 @@ const Home = () => {
         labels: {
           padding: 20,
           usePointStyle: true,
-          font: {
-            size: 14,
-            weight: '500'
-          },
-          color: 'var(--chart-text)'
         }
       },
       tooltip: {
         callbacks: {
           label: (context) => `₹${context.raw.toLocaleString()}`
-        },
-        titleFont: {
-          size: 16,
-          weight: '600'
-        },
-        bodyFont: {
-          size: 14,
-          weight: '500'
-        },
-        padding: 12,
-        backgroundColor: 'var(--card-bg)',
-        titleColor: 'var(--chart-text)',
-        bodyColor: 'var(--chart-text)',
-        borderColor: 'var(--border-color)',
-        borderWidth: 1
+        }
       }
     },
     scales: {
       x: {
         grid: {
           display: false
-        },
-        ticks: {
-          font: {
-            size: 14,
-            weight: '500'
-          },
-          color: 'var(--chart-text)'
         }
       },
       y: {
         beginAtZero: true,
         grid: {
           color: 'rgba(0, 0, 0, 0.1)'
-        },
-        ticks: {
-          font: {
-            size: 14,
-            weight: '500'
-          },
-          color: 'var(--chart-text)',
-          callback: function(value) {
-            return value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value;
-          }
         }
-      }
-    }
-  }), []);
-
-  // New options for pie and donut charts without axes
-  const pieDonutOptions = React.useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          padding: 20,
-          usePointStyle: true,
-          font: {
-            size: 14,
-            weight: '500'
-          },
-          color: 'var(--chart-text)'
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => `₹${context.raw.toLocaleString()}`
-        },
-        padding: 12,
-        backgroundColor: 'var(--card-bg)',
-        titleColor: 'var(--chart-text)',
-        bodyColor: 'var(--chart-text)',
-        borderColor: 'var(--border-color)',
-        borderWidth: 1
       }
     }
   }), []);
@@ -275,25 +207,25 @@ const Home = () => {
             <div className="chart-card">
               <h3>Your Tax Savings Growth</h3>
               <div className="chart-container">
-                <Line data={chartData.savings} options={lineBarOptions} />
+                <Line data={chartData.savings} options={chartOptions} />
               </div>
             </div>
             <div className="chart-card">
               <h3>Your Deductions Breakdown</h3>
               <div className="chart-container">
-                <Doughnut data={chartData.deductions} options={pieDonutOptions} />
+                <Doughnut data={chartData.deductions} options={chartOptions} />
               </div>
             </div>
             <div className="chart-card">
               <h3>Your Income Sources</h3>
               <div className="chart-container">
-                <Pie data={chartData.income} options={pieDonutOptions} />
+                <Pie data={chartData.income} options={chartOptions} />
               </div>
             </div>
             <div className="chart-card">
               <h3>Your Tax Payment Status</h3>
               <div className="chart-container">
-                <Bar data={chartData.taxComparison} options={lineBarOptions} />
+                <Bar data={chartData.taxComparison} options={chartOptions} />
               </div>
             </div>
           </div>
