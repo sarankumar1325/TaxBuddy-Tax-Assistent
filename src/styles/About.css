@@ -156,37 +156,121 @@
 }
 */
 
-/* Updated Team Section Styles */
+/* Enhanced Team Section Styles */
 .team-section {
-  padding: 2rem 0;
+  padding: 6rem 0;
   width: 100%;
+  background: var(--background-primary);
 }
 
 .team-container {
   width: 100%;
-  max-width: 1400px;  /* Increased max-width */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
 }
 
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Fixed 4 columns */
-  gap: 2.5rem; /* Increased gap between cards */
-  width: 100%;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.5rem;
+  justify-content: center;
+  margin: 2rem auto;
 }
 
 .team-card {
-  width: 100%;
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 2rem; /* Increased padding */
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
   text-align: center;
   transition: all 0.4s ease;
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.team-card:nth-child(1) {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+}
+
+.team-card:nth-child(2) {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05));
+}
+
+.team-card:nth-child(3) {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+}
+
+.team-card:nth-child(4) {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.1), rgba(236, 72, 153, 0.05));
+}
+
+.team-member-image {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  border: 3px solid transparent;
+  transition: all 0.4s ease;
+}
+
+.team-card:nth-child(1) .team-member-image { border-color: #3B82F6; }
+.team-card:nth-child(2) .team-member-image { border-color: #8B5CF6; }
+.team-card:nth-child(3) .team-member-image { border-color: #10B981; }
+.team-card:nth-child(4) .team-member-image { border-color: #EC4899; }
+
+.team-card h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.member-role {
+  display: inline-block;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0.75rem 0;
+  transition: all 0.3s ease;
+}
+
+.team-card:nth-child(1) .member-role { background: #3B82F6; }
+.team-card:nth-child(2) .member-role { background: #8B5CF6; }
+.team-card:nth-child(3) .member-role { background: #10B981; }
+.team-card:nth-child(4) .member-role { background: #EC4899; }
+
+.member-social {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.member-social a {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.team-card:nth-child(1) .member-social a:hover { background: #3B82F6; color: white; }
+.team-card:nth-child(2) .member-social a:hover { background: #8B5CF6; color: white; }
+.team-card:nth-child(3) .member-social a:hover { background: #10B981; color: white; }
+.team-card:nth-child(4) .member-social a:hover { background: #EC4899; color: white; }
+
+.team-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive adjustments */
@@ -206,17 +290,6 @@
   .team-container {
     padding: 0 1rem;
   }
-}
-
-.team-member-image {
-  width: 120px; /* Reduced from 150px */
-  height: 120px; /* Reduced from 150px */
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
-  overflow: hidden;
-  position: relative;
-  border: 3px solid var(--accent-color);
-  transition: all 0.4s ease;
 }
 
 .team-member-image img {
@@ -258,7 +331,7 @@
 .member-social {
   display: flex;
   justify-content: center;
-  gap: 1.5rem; /* Increased gap between social icons */
+  gap: 0.75rem; /* Reduced from 1.5rem */
   margin-top: 1.5rem;
   opacity: 1; /* Always visible now */
   transform: translateY(0); /* Remove initial transform */
@@ -272,17 +345,19 @@
 
 .member-social a {
   color: var(--text-primary);
-  font-size: 1.4rem; /* Slightly larger icons */
+  font-size: 1.2rem; /* Slightly smaller */
   transition: all 0.3s ease;
-  padding: 0.5rem;
-  border-radius: 50%;
-  background: var(--background-secondary);
+  padding: 0.4rem; /* Reduced padding */
+  border-radius: 8px; /* Changed from 50% to 8px for softer look */
+  background: rgba(255, 255, 255, 0.1); /* Lighter background */
+  backdrop-filter: blur(5px);
 }
 
 .member-social a:hover {
   color: var(--accent-color);
   transform: translateY(-3px);
-  background: var(--background-primary);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes fadeSlideUp {
