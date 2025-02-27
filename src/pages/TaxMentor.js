@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../styles/TaxMentor.css';
 import { FaUserGraduate, FaChartLine, FaFileAlt } from 'react-icons/fa';
 
@@ -15,11 +15,13 @@ const TaxMentor = () => {
 
       <div className="mentor-content">
         <div className="mentor-chat-interface">
-          {/* Chat interface will be implemented here */}
-          <div className="chat-placeholder">
-            <h2>Welcome to Tax Mentor</h2>
-            <p>Start your conversation with our tax expert system</p>
-          </div>
+          <iframe
+            src="https://app.vectorshift.ai/chatbots/embedded/67bfecd26c05da5fcc3f95d5?openChatbot=true"
+            width="100%"
+            height="600px"
+            style={{ border: 'none' }}
+            allow="clipboard-read; clipboard-write; microphone"
+          />
         </div>
       </div>
     </div>
