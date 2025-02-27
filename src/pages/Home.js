@@ -1,52 +1,193 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaRobot, FaChartLine, FaBook, FaBell, FaArrowRight, FaHome, FaComments, FaGraduationCap, FaBuilding, FaCog, FaUser } from 'react-icons/fa';
+import { Line, Doughnut, Pie, Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarElement
+} from 'chart.js';
 import '../styles/Home.css';
+import FAQ from '../components/FAQ';
+
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,  // Add this
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 const Home = () => {
-  const dashboardItems = [
-    {
-      icon: '📊',
-      title: 'Activity Overview',
-      description: 'Recent calculations & tax activities',
-      content: {
-        items: [
-          { label: 'Last Tax Filing', value: 'April 15, 2024' },
-          { label: 'Recent Deductions', value: '$2,500' },
-          { label: 'Pending Tasks', value: '3' }
-        ]
+  const chartData = React.useMemo(() => ({
+    savings: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Your Tax Savings',
+        data: [1200, 1900, 2400, 2800, 3200, 4200].map(val => val * 80), // Converting to approximate rupees
+        borderColor: '#10B981',
+        tension: 0.4,
+        fill: true,
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+      }]
+    },
+    deductions: {
+      labels: ['Home Office', 'Healthcare', 'Education', 'Retirement', 'Charitable'],
+      datasets: [{
+        label: 'Your Deductions',
+        data: [2500, 1800, 3200, 4500, 1000].map(val => val * 80), // Converting to approximate rupees
+        backgroundColor: [
+          '#10B981',
+          '#3B82F6',
+          '#6366F1',
+          '#8B5CF6',
+          '#EC4899'
+        ],
+        borderWidth: 0,
+      }]
+    },
+    income: {
+      labels: ['Salary', 'Investments', 'Side Business', 'Other'],
+      datasets: [{
+        label: 'Your Income Sources',
+        data: [65000, 5000, 3000, 2000].map(val => val * 80), // Converting to approximate rupees
+        backgroundColor: [
+          '#60A5FA',
+          '#34D399',
+          '#F472B6',
+          '#FBBF24'
+        ],
+        borderWidth: 0,
+      }]
+    },
+    taxComparison: {
+      labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+      datasets: [
+        {
+          label: 'Your Tax Liability',
+          data: [4125, 4125, 4125, 4125],
+          backgroundColor: '#F472B6',
+        },
+        {
+          label: 'Amount Paid',
+          data: [4125, 4125, 4125, 0],
+          backgroundColor: '#60A5FA',
+        }
+      ]
+    }
+  }), []);
+
+  const chartOptions = React.useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `₹${context.raw.toLocaleString()}`
+        }
       }
     },
-    {
-      icon: '📈',
-      title: 'Financial Summary',
-      description: 'Income, deductions & tax savings',
-      content: {
-        items: [
-          { label: 'Total Income', value: '$75,000' },
-          { label: 'Tax Savings', value: '$4,200' },
-          { label: 'Deductions', value: '$8,500' }
-        ]
-      }
-    },
-    {
-      icon: '🔎',
-      title: 'Important Updates',
-      description: 'Tasks & upcoming deadlines',
-      content: {
-        items: [
-          { label: 'Next Deadline', value: 'May 1, 2024' },
-          { label: 'Documents Due', value: '2' },
-          { label: 'Alerts', value: '1' }
-        ]
+    scales: {
+      x: {
+        grid: {
+          display: false
+        }
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)'
+        }
       }
     }
-  ];
+  }), []);
+
+  const heroStyle = {
+    backgroundImage: "url('/hero.jpg')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+    width: '100%',
+    minHeight: '100vh',
+  };
+
+  const summaryCards = React.useMemo(() => [
+    {
+      icon: '👤',
+      title: 'Personal Overview',
+      bgColor: 'var(--card-accent-1)',
+      items: [
+        { label: 'Tax ID', value: 'XXXXX1234' },
+        { label: 'Filing Status', value: 'Individual' },
+        { label: 'Tax Year', value: '2024' }
+      ]
+    },
+    {
+      icon: '💰',
+      title: 'Tax Summary',
+      bgColor: 'var(--card-accent-2)',
+      items: [
+        { label: 'Annual Income', value: '₹75,00,000' },
+        { label: 'Tax Rate', value: '22%' },
+        { label: 'Est. Tax Due', value: '₹16,50,000' }
+      ]
+    }
+  ], []);
+
+  const features = React.useMemo(() => [
+    {
+      icon: <FaRobot className="feature-icon" />,
+      title: "AI-Powered Tax Analysis",
+      description: "Let our intelligent chatbot analyze your financial data and suggest personalized tax strategies.",
+      color: "#10B981",
+      gradient: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))"
+    },
+    {
+      icon: <FaComments className="feature-icon" />,
+      title: "Instant Help, Anytime",
+      description: "Got a tax question? Chat with our bot for quick, accurate answers.",
+      color: "#3B82F6",
+      gradient: "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))"
+    },
+    {
+      icon: <FaBook className="feature-icon" />,
+      title: "Learn & Grow",
+      description: "Explore our curated library to understand tax concepts, laws, and best practices.",
+      color: "#8B5CF6",
+      gradient: "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05))"
+    },
+    {
+      icon: <FaBell className="feature-icon" />,
+      title: "Stay Informed",
+      description: "Get real-time notifications on tax deadlines, policy changes, and more.",
+      color: "#EC4899",
+      gradient: "linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(236, 72, 153, 0.05))"
+    }
+  ], []);
 
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <section className="hero-section">
+      <section className="hero-section" style={heroStyle}>
         <div className="hero-content">
           <h1>Welcome to TaxBuddy</h1>
           <h2>Your AI-Powered Tax Assistant</h2>
@@ -57,33 +198,55 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Introduction Section */}
-      <section className="intro-section">
-        <p className="intro-text">
-          Say goodbye to tax season stress! TaxBuddy is your all-in-one platform for effortless tax analysis, 
-          filing, and learning. Powered by advanced AI, our chatbot is ready to assist you 24/7 — making sure 
-          you never miss a deduction or fall behind on compliance.
-        </p>
+      {/* Modified Overview Section - Charts Only */}
+      <section className="overview-section fade-in">
+        <h2>Your Personal Tax Dashboard</h2>
+        <div className="charts-scroll-container">
+          <div className="charts-scroll-grid">
+            {/* Charts Only - Remove Info Cards */}
+            <div className="chart-card">
+              <h3>Your Tax Savings Growth</h3>
+              <div className="chart-container">
+                <Line data={chartData.savings} options={chartOptions} />
+              </div>
+            </div>
+            <div className="chart-card">
+              <h3>Your Deductions Breakdown</h3>
+              <div className="chart-container">
+                <Doughnut data={chartData.deductions} options={chartOptions} />
+              </div>
+            </div>
+            <div className="chart-card">
+              <h3>Your Income Sources</h3>
+              <div className="chart-container">
+                <Pie data={chartData.income} options={chartOptions} />
+              </div>
+            </div>
+            <div className="chart-card">
+              <h3>Your Tax Payment Status</h3>
+              <div className="chart-container">
+                <Bar data={chartData.taxComparison} options={chartOptions} />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Dashboard Section */}
-      <section className="dashboard-section fade-in">
-        <h2>Your Tax Overview</h2>
-        <div className="dashboard-grid">
-          {dashboardItems.map((item, index) => (
-            <div key={index} className="dashboard-card">
-              <div className="card-header">
-                <span className="card-icon">{item.icon}</span>
-                <div className="card-title">
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </div>
+      {/* New Summary Section with Title */}
+      <section className="summary-section fade-in">
+        <h2 className="summary-title">Your Tax Profile Overview</h2>
+        <div className="summary-container">
+          {summaryCards.map((card, index) => (
+            <div key={index} className="summary-card" style={{ background: card.bgColor }}>
+              <div className="summary-header">
+                <span className="summary-icon">{card.icon}</span>
+                <h3>{card.title}</h3>
               </div>
-              <div className="card-content">
-                {item.content.items.map((contentItem, i) => (
-                  <div key={i} className="content-item">
-                    <span className="item-label">{contentItem.label}</span>
-                    <span className="item-value">{contentItem.value}</span>
+              <div className="summary-content">
+                {card.items.map((item, i) => (
+                  <div key={i} className="summary-item">
+                    <span className="summary-label">{item.label}</span>
+                    <span className="summary-value">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -92,68 +255,30 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Enhanced Features Section */}
       <section className="features-section">
-        <h2>What Makes TaxBuddy Stand Out?</h2>
+        <h2 className="features-title">What Makes TaxBuddy Stand Out?</h2>
         <div className="features-grid">
-          <div className="feature-card">
-            <FaRobot className="feature-icon" />
-            <h3>AI-Powered Tax Analysis</h3>
-            <p>Let our intelligent chatbot analyze your financial data and suggest personalized tax strategies.</p>
-          </div>
-          <div className="feature-card">
-            <FaComments className="feature-icon" />
-            <h3>Instant Help, Anytime</h3>
-            <p>Got a tax question? Chat with our bot for quick, accurate answers.</p>
-          </div>
-          <div className="feature-card">
-            <FaBook className="feature-icon" />
-            <h3>Learn & Grow</h3>
-            <p>Explore our curated library to understand tax concepts, laws, and best practices.</p>
-          </div>
-          <div className="feature-card">
-            <FaBell className="feature-icon" />
-            <h3>Stay Informed</h3>
-            <p>Get real-time notifications on tax deadlines, policy changes, and more.</p>
-          </div>
+          {features.map((feature, index) => (
+            <div 
+              key={index} 
+              className="feature-card" 
+              style={{ background: feature.gradient }}
+            >
+              <div className="feature-icon-wrapper" style={{ color: feature.color }}>
+                {feature.icon}
+                <div className="feature-icon-bg" style={{ borderColor: feature.color }}></div>
+              </div>
+              <h3 style={{ color: feature.color }}>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Navigation Section */}
-      <section className="navigation-section">
-        <h2 className="nav-section-title">Your Tax Hub, All in One Place</h2>
-        <div className="nav-grid">
-          <Link to="/" className="nav-card">
-            <FaHome className="nav-icon" />
-            <h3>Home</h3>
-            <p>Your dashboard for quick tax insights and updates.</p>
-          </Link>
-          <Link to="/profile" className="nav-card">
-            <FaUser className="nav-icon" />
-            <h3>Profile</h3>
-            <p>Manage your account and personal information.</p>
-          </Link>
-          <Link to="/learn" className="nav-card">
-            <FaGraduationCap className="nav-icon" />
-            <h3>Learn</h3>
-            <p>Access educational resources and guides.</p>
-          </Link>
-          <Link to="/about" className="nav-card">
-            <FaBuilding className="nav-icon" />
-            <h3>About</h3>
-            <p>Discover more about TaxBuddy and our mission.</p>
-          </Link>
-        </div>
-      </section>
+      {/* Add FAQ Section */}
+      <FAQ />
 
-      {/* CTA Section */}
-      <section className="cta-section">
-        <h2>Get Started & Take Control of Your Taxes</h2>
-        <p>Whether you're a freelancer, business owner, or just want to maximize your refund, TaxBuddy is your trusted companion.</p>
-        <Link to="/learn" className="cta-button">
-          Start Learning <FaArrowRight />
-        </Link>
-      </section>
     </div>
   );
 };

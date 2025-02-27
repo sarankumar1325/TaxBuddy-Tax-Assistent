@@ -11,6 +11,7 @@ import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/SignUp';
 import Learn from './pages/Learn';
 import Notifications from './pages/Notifications';
+import Social from './pages/Social';
 import './App.css';
 
 const AppContent = () => {
@@ -44,6 +45,7 @@ const AppContent = () => {
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/signup" element={<SignUp setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/social" element={<Social />} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

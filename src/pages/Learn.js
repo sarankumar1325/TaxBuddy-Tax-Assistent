@@ -1,330 +1,407 @@
 import React, { useState } from 'react';
-import { FaBook, FaVideo, FaQuestionCircle, FaCertificate, FaChartLine, FaFileAlt, FaLightbulb, FaUserTie } from 'react-icons/fa';
+import { FaVideo, FaQuestionCircle, FaCertificate, FaGraduationCap, FaArrowLeft, FaCheck, FaLock, FaPlay, FaFile, FaBook, FaLightbulb, FaTrophy } from 'react-icons/fa';
 import '../styles/Learn.css';
 
 const Learn = () => {
-  const [activeTab, setActiveTab] = useState('tutorials');
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
-
-  const tutorials = [
-    {
-      id: 1,
-      title: "Tax Fundamentals",
-      description: "Essential concepts for understanding taxation",
-      duration: "45 mins",
-      level: "Beginner",
-      icon: <FaLightbulb />,
-      topics: ["Basic tax terms", "Filing requirements", "Tax brackets"]
-    },
-    {
-      id: 2,
-      title: "Income Tax Mastery",
-      description: "Comprehensive guide to income tax calculation",
-      duration: "60 mins",
-      level: "Intermediate",
-      icon: <FaChartLine />,
-      topics: ["Salary income", "Business income", "Capital gains"]
-    },
-    {
-      id: 3,
-      title: "Deductions & Credits",
-      description: "Maximize your tax savings",
-      duration: "50 mins",
-      level: "Intermediate",
-      icon: <FaFileAlt />,
-      topics: ["Standard deductions", "Itemized deductions", "Tax credits"]
-    },
-    {
-      id: 4,
-      title: "Business Taxation",
-      description: "Tax strategies for business owners",
-      duration: "75 mins",
-      level: "Advanced",
-      icon: <FaUserTie />,
-      topics: ["Business structures", "Expenses", "Quarterly taxes"]
-    }
-  ];
+  const [activeTab, setActiveTab] = useState('courses');
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [activeModule, setActiveModule] = useState(null);
 
   const courses = [
     {
       id: 1,
-      title: "Complete Tax Course 2024",
-      modules: 12,
-      duration: "8 hours",
-      level: "All Levels",
-      highlights: [
-        "Personal & Business Tax",
-        "Investment Income",
-        "International Tax",
-        "Real-world Case Studies"
-      ],
-      price: "$99"
+      title: "Tax Fundamentals 2024",
+      description: "Master the basics of personal and business taxation",
+      duration: "4 weeks",
+      level: "Beginner",
+      progress: 0,
+      modules: ["Tax Basics", "Filing Requirements", "Deductions", "Credits"],
+      icon: <FaGraduationCap />
     },
     {
       id: 2,
-      title: "Business Tax Masterclass",
-      modules: 8,
-      duration: "4 hours",
-      level: "Advanced"
-    }
-  ];
-
-  const quizCategories = [
-    {
-      title: "Basic Tax Knowledge",
-      questions: 20,
-      time: "30 mins",
-      topics: ["Tax Basics", "Filing Status", "Deductions"]
-    },
-    {
-      title: "Advanced Tax Scenarios",
-      questions: 15,
-      time: "45 mins",
-      topics: ["Business Tax", "Investments", "Foreign Income"]
-    }
-  ];
-
-  const pathways = [
-    {
-      title: "Personal Tax Expert",
-      duration: "3 months",
-      modules: [
-        "Tax Fundamentals",
-        "Income Tax Mastery",
-        "Deductions & Credits",
-        "Final Certification"
-      ]
-    },
-    {
-      title: "Business Tax Specialist",
-      duration: "4 months",
-      modules: [
-        "Business Structures",
-        "Corporate Taxation",
-        "International Tax",
-        "Advanced Certification"
-      ]
+      title: "Advanced Tax Planning",
+      description: "Strategic tax optimization techniques for professionals",
+      duration: "6 weeks",
+      level: "Advanced",
+      progress: 35,
+      modules: ["Investment Tax", "Estate Planning", "International Tax", "Business Tax"],
+      icon: <FaVideo />
     }
   ];
 
   const quizzes = [
     {
       id: 1,
-      title: "Tax Basics Quiz",
-      description: "Test your knowledge of fundamental tax concepts",
+      title: "Tax Essentials Quiz",
+      description: "Test your understanding of fundamental tax concepts",
       questions: 20,
       duration: "30 mins",
       difficulty: "Beginner",
-      topics: ["Income Tax", "Deductions", "Filing Status"]
+      topics: ["Basic Tax", "Deductions", "Credits"]
     },
     {
       id: 2,
-      title: "Business Tax Quiz",
-      description: "Challenge yourself with business taxation scenarios",
-      questions: 15,
-      duration: "25 mins",
-      difficulty: "Intermediate",
-      topics: ["Corporate Tax", "Business Deductions", "Quarterly Taxes"]
-    },
-    {
-      id: 3,
       title: "Advanced Tax Concepts",
-      description: "Expert level questions on complex tax situations",
+      description: "Challenge yourself with complex tax scenarios",
       questions: 25,
       duration: "45 mins",
       difficulty: "Advanced",
-      topics: ["International Tax", "Investment Income", "Estate Planning"]
+      topics: ["Business Tax", "Investments", "International"]
     }
   ];
 
   const certificates = [
     {
       id: 1,
-      title: "Tax Fundamentals",
-      status: "Completed",
-      completedDate: "2024-01-15",
-      score: "95%",
+      title: "Tax Professional Certificate",
+      status: "In Progress",
+      progress: "65%",
+      validUntil: "2025",
       badge: "🏆"
     },
     {
       id: 2,
-      title: "Business Tax Specialist",
-      status: "In Progress",
-      progress: "65%",
-      badge: "🎯"
-    },
-    {
-      id: 3,
       title: "Advanced Tax Planning",
       status: "Not Started",
-      badge: "🎓"
+      badge: "🎯",
+      requirements: ["Complete Course", "Pass Final Exam", "Submit Project"]
     }
   ];
 
+  const courseContent = {
+    1: {
+      title: "Tax Fundamentals 2024",
+      modules: [
+        {
+          id: 1,
+          title: "Tax Basics",
+          completed: false,
+          locked: false,
+          content: [
+            { type: 'video', title: 'Introduction to Taxation', duration: '15:00', completed: false },
+            { type: 'reading', title: 'Understanding Tax Terms', duration: '10 mins', completed: false },
+            { type: 'practice', title: 'Basic Tax Calculations', duration: '20 mins', completed: false },
+            { type: 'reading', title: 'Tax Filing Status Guide', duration: '15 mins', completed: false },
+            { type: 'video', title: 'Income Types & Classification', duration: '20:00', completed: false },
+            { type: 'quiz', title: 'Basic Tax Concepts Quiz', questions: 10, completed: false }
+          ]
+        },
+        {
+          id: 2,
+          title: "Filing Requirements",
+          completed: false,
+          locked: true,
+          content: [
+            { type: 'video', title: 'Tax Filing Process Overview', duration: '20:00', completed: false },
+            { type: 'reading', title: 'Required Documents Checklist', duration: '15 mins', completed: false },
+            { type: 'practice', title: 'Form 1040 Walkthrough', duration: '30 mins', completed: false },
+            { type: 'video', title: 'Common Filing Mistakes', duration: '25:00', completed: false },
+            { type: 'worksheet', title: 'Document Organization', duration: '20 mins', completed: false },
+            { type: 'quiz', title: 'Filing Requirements Test', questions: 15, completed: false }
+          ]
+        },
+        {
+          id: 3,
+          title: "Deductions & Credits",
+          completed: false,
+          locked: true,
+          content: [
+            { type: 'video', title: 'Standard vs Itemized Deductions', duration: '25:00', completed: false },
+            { type: 'reading', title: 'Popular Tax Deductions Guide', duration: '20 mins', completed: false },
+            { type: 'practice', title: 'Deduction Calculator Workshop', duration: '30 mins', completed: false },
+            { type: 'video', title: 'Tax Credits Explained', duration: '22:00', completed: false },
+            { type: 'case-study', title: 'Real-world Deduction Examples', duration: '25 mins', completed: false },
+            { type: 'assessment', title: 'Deduction Scenarios', questions: 5, completed: false }
+          ]
+        },
+        {
+          id: 4,
+          title: "Income Reporting",
+          completed: false,
+          locked: true,
+          content: [
+            { type: 'video', title: 'Types of Income', duration: '18:00', completed: false },
+            { type: 'reading', title: 'W-2 and 1099 Forms Guide', duration: '15 mins', completed: false },
+            { type: 'practice', title: 'Income Reporting Workshop', duration: '25 mins', completed: false },
+            { type: 'video', title: 'Self-Employment Income', duration: '20:00', completed: false },
+            { type: 'worksheet', title: 'Income Classification Tool', duration: '15 mins', completed: false },
+            { type: 'quiz', title: 'Income Reporting Test', questions: 12, completed: false }
+          ]
+        }
+      ]
+    },
+    2: {
+      title: "Advanced Tax Planning",
+      modules: [
+        {
+          id: 1,
+          title: "Investment Tax Strategies",
+          completed: true,
+          locked: false,
+          content: [
+            { type: 'video', title: 'Investment Income Types', duration: '30:00', completed: true },
+            { type: 'reading', title: 'Capital Gains Guide', duration: '25 mins', completed: true },
+            { type: 'practice', title: 'Capital Gains Calculator', duration: '45 mins', completed: true },
+            { type: 'video', title: 'Tax-Efficient Investing', duration: '35:00', completed: true },
+            { type: 'case-study', title: 'Investment Portfolio Analysis', duration: '40 mins', completed: true },
+            { type: 'assessment', title: 'Investment Scenarios', questions: 8, completed: true }
+          ]
+        },
+        {
+          id: 2,
+          title: "Estate Planning",
+          completed: false,
+          locked: false,
+          content: [
+            { type: 'video', title: 'Estate Tax Fundamentals', duration: '35:00', completed: false },
+            { type: 'reading', title: 'Estate Planning Basics', duration: '30 mins', completed: false },
+            { type: 'practice', title: 'Estate Tax Calculator', duration: '40 mins', completed: false },
+            { type: 'video', title: 'Trust Planning Strategies', duration: '45:00', completed: false },
+            { type: 'worksheet', title: 'Estate Planning Tools', duration: '40 mins', completed: false },
+            { type: 'quiz', title: 'Estate Tax Assessment', questions: 12, completed: false }
+          ]
+        },
+        {
+          id: 3,
+          title: "International Taxation",
+          completed: false,
+          locked: true,
+          content: [
+            { type: 'video', title: 'International Tax Basics', duration: '40:00', completed: false },
+            { type: 'reading', title: 'Foreign Income Guide', duration: '35 mins', completed: false },
+            { type: 'practice', title: 'FBAR Reporting Workshop', duration: '50 mins', completed: false },
+            { type: 'video', title: 'Treaty Benefits Overview', duration: '30:00', completed: false },
+            { type: 'case-study', title: 'International Tax Scenarios', duration: '45 mins', completed: false },
+            { type: 'assessment', title: 'Global Tax Quiz', questions: 15, completed: false }
+          ]
+        },
+        {
+          id: 4,
+          title: "Business Tax Planning",
+          completed: false,
+          locked: true,
+          content: [
+            { type: 'video', title: 'Business Structure & Taxation', duration: '45:00', completed: false },
+            { type: 'reading', title: 'Business Deductions Guide', duration: '40 mins', completed: false },
+            { type: 'practice', title: 'Business Expense Tracking', duration: '35 mins', completed: false },
+            { type: 'video', title: 'Tax Credits for Businesses', duration: '30:00', completed: false },
+            { type: 'worksheet', title: 'Business Tax Planning', duration: '50 mins', completed: false },
+            { type: 'final-quiz', title: 'Business Tax Mastery', questions: 20, completed: false }
+          ]
+        }
+      ]
+    }
+  };
+
+  const handleStartCourse = (courseId) => {
+    setSelectedCourse(courseId);
+    setActiveModule(1);
+  };
+
+  const getContentIcon = (type) => {
+    switch(type) {
+      case 'video': return <FaPlay />;
+      case 'reading': return <FaBook />;
+      case 'quiz': return <FaQuestionCircle />;
+      case 'practice': return <FaFile />;
+      default: return <FaFile />;
+    }
+  };
+
+  const stats = [
+    { number: "24", label: "Courses", icon: <FaGraduationCap /> },
+    { number: "120+", label: "Lessons", icon: <FaBook /> },
+    { number: "5K+", label: "Students", icon: <FaLightbulb /> },
+    { number: "98%", label: "Success Rate", icon: <FaTrophy /> }
+  ];
+
+  if (selectedCourse) {
+    const course = courseContent[selectedCourse];
+    return (
+      <div className="course-view fade-in">
+        <button 
+          className="back-button"
+          onClick={() => setSelectedCourse(null)}
+        >
+          <FaArrowLeft /> Back to Courses
+        </button>
+
+        <h2 className="course-title">{course.title}</h2>
+        
+        <div className="course-layout">
+          <div className="modules-sidebar">
+            {course.modules.map(module => (
+              <div 
+                key={module.id}
+                className={`module-item ${module.locked ? 'locked' : ''} ${module.completed ? 'completed' : ''} ${activeModule === module.id ? 'active' : ''}`}
+                onClick={() => !module.locked && setActiveModule(module.id)}
+              >
+                <div className="module-header">
+                  {module.completed ? <FaCheck className="module-icon" /> : 
+                   module.locked ? <FaLock className="module-icon" /> : 
+                   <span className="module-number">{module.id}</span>}
+                  <span className="module-title">{module.title}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="module-content">
+            {course.modules.find(m => m.id === activeModule)?.content.map((item, index) => (
+              <div key={index} className="content-item">
+                {getContentIcon(item.type)}
+                <div className="content-info">
+                  <h4>{item.title}</h4>
+                  <span className="content-meta">
+                    {item.duration || `${item.questions} questions`}
+                  </span>
+                </div>
+                <button className={`content-button ${item.completed ? 'completed' : ''}`}>
+                  {item.completed ? 'Review' : 'Start'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="learn-container">
+    <div className="learn-container fade-in">
       <div className="learn-header">
-        <h1>Learning Center</h1>
-        <p>Enhance your tax knowledge with our comprehensive learning resources</p>
+        <h1>Learn Tax Management</h1>
+        <p>Master tax fundamentals and advanced strategies through our comprehensive courses</p>
       </div>
 
-      <div className="learning-paths-section">
-        <h2>Learning Paths</h2>
-        <div className="paths-grid">
-          {pathways.map((path, index) => (
-            <div key={index} className="path-card">
-              <h3>{path.title}</h3>
-              <span className="duration">{path.duration}</span>
-              <ul className="path-modules">
-                {path.modules.map((module, i) => (
-                  <li key={i}>{module}</li>
-                ))}
-              </ul>
-              <button className="start-path-button">Begin Path</button>
-            </div>
+      <div className="learn-navigation">
+        <div className="tabs-wrapper">
+          {[
+            { id: 'courses', icon: <FaVideo />, label: 'Courses' },
+            { id: 'quiz', icon: <FaQuestionCircle />, label: 'Practice Quiz' },
+            { id: 'certificates', icon: <FaCertificate />, label: 'Certificates' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="learn-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'tutorials' ? 'active' : ''}`}
-          onClick={() => setActiveTab('tutorials')}
-        >
-          <FaBook /> Tutorials
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'courses' ? 'active' : ''}`}
-          onClick={() => setActiveTab('courses')}
-        >
-          <FaVideo /> Courses
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'quiz' ? 'active' : ''}`}
-          onClick={() => setActiveTab('quiz')}
-        >
-          <FaQuestionCircle /> Practice Quiz
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'certificates' ? 'active' : ''}`}
-          onClick={() => setActiveTab('certificates')}
-        >
-          <FaCertificate /> Certificates
-        </button>
-      </div>
-
       <div className="learn-content">
-        {activeTab === 'tutorials' && (
-          <>
-            <div className="tutorials-grid">
-              {tutorials.map(tutorial => (
-                <div key={tutorial.id} className="tutorial-card">
-                  <div className="card-icon">{tutorial.icon}</div>
-                  <h3>{tutorial.title}</h3>
-                  <p>{tutorial.description}</p>
-                  <div className="tutorial-meta">
-                    <span className="duration">{tutorial.duration}</span>
-                    <span className="level">{tutorial.level}</span>
-                  </div>
-                  <div className="topics-list">
-                    {tutorial.topics.map((topic, i) => (
-                      <span key={i} className="topic-tag">{topic}</span>
-                    ))}
-                  </div>
-                  <button className="start-button">Start Learning</button>
-                </div>
-              ))}
-            </div>
-            <div className="progress-tracker">
-              <h3>Your Progress</h3>
-              <div className="progress-bar">
-                <div className="progress" style={{width: '35%'}}></div>
-              </div>
-              <p>35% Complete</p>
-            </div>
-          </>
-        )}
-
         {activeTab === 'courses' && (
           <div className="courses-grid">
-            {courses.map(course => (
-              <div key={course.id} className="course-card">
+            {courses.map((course, index) => (
+              <div
+                key={course.id}
+                className="course-card slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="course-icon">{course.icon}</div>
                 <h3>{course.title}</h3>
+                <p>{course.description}</p>
                 <div className="course-meta">
-                  <span>{course.modules} Modules</span>
-                  <span>{course.duration}</span>
-                  <span>{course.level}</span>
+                  <span className="duration">{course.duration}</span>
+                  <span className={`level ${course.level.toLowerCase()}`}>
+                    {course.level}
+                  </span>
                 </div>
-                <button className="enroll-button">Enroll Now</button>
+                <div className="modules-list">
+                  {course.modules.map((module, i) => (
+                    <div key={i} className="module-item">
+                      <span className="module-dot"></span>
+                      {module}
+                    </div>
+                  ))}
+                </div>
+                <div className="progress-container">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: `${course.progress}%` }}></div>
+                  </div>
+                  <span className="progress-text">{course.progress}% Complete</span>
+                </div>
+                <button className="start-course-btn glow" onClick={() => handleStartCourse(course.id)}>
+                  {course.progress > 0 ? 'Continue Course' : 'Start Course'}
+                </button>
               </div>
             ))}
           </div>
         )}
 
         {activeTab === 'quiz' && (
-          <div className="quiz-section">
-            <h2>Practice Quizzes</h2>
-            <p>Test your knowledge and track your progress</p>
-            <div className="quiz-grid">
-              {quizzes.map(quiz => (
-                <div key={quiz.id} className="quiz-card">
-                  <h3>{quiz.title}</h3>
-                  <p>{quiz.description}</p>
-                  <div className="quiz-meta">
-                    <span>{quiz.questions} Questions</span>
-                    <span>{quiz.duration}</span>
-                    <span className={`difficulty ${quiz.difficulty.toLowerCase()}`}>
-                      {quiz.difficulty}
-                    </span>
-                  </div>
-                  <div className="topics-list">
-                    {quiz.topics.map((topic, i) => (
-                      <span key={i} className="topic-tag">{topic}</span>
-                    ))}
-                  </div>
-                  <button className="start-quiz-button">Start Quiz</button>
+          <div className="quiz-grid">
+            {quizzes.map((quiz, index) => (
+              <div
+                key={quiz.id}
+                className="quiz-card slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <h3>{quiz.title}</h3>
+                <p>{quiz.description}</p>
+                <div className="quiz-meta">
+                  <span>{quiz.questions} Questions</span>
+                  <span>{quiz.duration}</span>
+                  <span className={`difficulty ${quiz.difficulty.toLowerCase()}`}>
+                    {quiz.difficulty}
+                  </span>
                 </div>
-              ))}
-            </div>
+                <div className="topics-list">
+                  {quiz.topics.map((topic, i) => (
+                    <span key={i} className="topic-tag">{topic}</span>
+                  ))}
+                </div>
+                <button className="start-quiz-button glow">Take Quiz</button>
+              </div>
+            ))}
           </div>
         )}
 
         {activeTab === 'certificates' && (
-          <div className="certificates-section">
-            <h2>Your Certificates</h2>
-            <p>Track your learning achievements</p>
-            <div className="certificates-grid">
-              {certificates.map(cert => (
-                <div key={cert.id} className="certificate-card">
-                  <div className="certificate-badge">{cert.badge}</div>
-                  <h3>{cert.title}</h3>
-                  <div className="certificate-meta">
-                    <div className={`status ${cert.status.toLowerCase().replace(' ', '-')}`}>
-                      {cert.status}
-                    </div>
-                    {cert.completedDate && (
-                      <div className="completion-date">
-                        Completed: {new Date(cert.completedDate).toLocaleDateString()}
-                      </div>
-                    )}
-                    {cert.score && <div className="score">Score: {cert.score}</div>}
-                    {cert.progress && (
-                      <div className="progress-bar">
-                        <div className="progress" style={{ width: cert.progress }}></div>
-                        <span>{cert.progress}</span>
-                      </div>
-                    )}
+          <div className="certificates-grid">
+            {certificates.map((cert, index) => (
+              <div
+                key={cert.id}
+                className="certificate-card slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="certificate-badge">{cert.badge}</div>
+                <h3>{cert.title}</h3>
+                <div className="certificate-meta">
+                  <div className={`status ${cert.status.toLowerCase().replace(' ', '-')}`}>
+                    {cert.status}
                   </div>
-                  <button 
-                    className="certificate-action-button"
-                    disabled={cert.status === 'Completed'}
-                  >
-                    {cert.status === 'Completed' ? 'View Certificate' : 
-                     cert.status === 'In Progress' ? 'Continue' : 'Start Course'}
-                  </button>
+                  {cert.progress && (
+                    <div className="progress-bar">
+                      <div className="progress-fill" style={{ width: cert.progress }}></div>
+                      <span>{cert.progress}</span>
+                    </div>
+                  )}
+                  {cert.validUntil && (
+                    <div className="valid-until">Valid until: {cert.validUntil}</div>
+                  )}
                 </div>
-              ))}
-            </div>
+                {cert.requirements && (
+                  <div className="requirements-list">
+                    {cert.requirements.map((req, i) => (
+                      <div key={i} className="requirement-item">
+                        <span className="requirement-dot"></span>
+                        {req}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button className="certificate-action-button glow">
+                  {cert.status === 'Completed' ? 'View Certificate' : 
+                   cert.status === 'In Progress' ? 'Continue' : 'Start Certification'}
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

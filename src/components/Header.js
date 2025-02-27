@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSun, FaMoon, FaBars, FaTimes, FaBell, FaCog, FaUser } from 'react-icons/fa';
+import { FaSun, FaMoon, FaBars, FaTimes, FaBell, FaCog, FaUser, FaUsers } from 'react-icons/fa';
 import '../styles/Header.css';
 
 const Header = ({ theme, toggleTheme }) => {
@@ -35,6 +35,9 @@ const Header = ({ theme, toggleTheme }) => {
         </Link>
         <Link to="/learn" className="nav-link" onClick={closeMenu}>
           Learn
+        </Link>
+        <Link to="/social" className="nav-link" onClick={closeMenu}>
+          Social
         </Link>
         <Link to="/about" className="nav-link" onClick={closeMenu}>
           About
