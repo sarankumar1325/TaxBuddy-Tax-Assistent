@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaRobot, FaChartLine, FaBook, FaBell, FaArrowRight, FaHome, FaComments, FaGraduationCap, FaBuilding, FaCog, FaUser } from 'react-icons/fa';
 import { Line, Doughnut, Pie, Bar } from 'react-chartjs-2';
@@ -14,6 +14,8 @@ import {
   ArcElement,
   BarElement
 } from 'chart.js';
+import { auth, db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import '../styles/Home.css';
 import FAQ from '../components/FAQ';
 
@@ -30,7 +32,32 @@ ChartJS.register(
   ArcElement
 );
 
+const defaultUserData = {
+  name: 'Not set',
+  email: 'Not set',
+  ssn: 'XXXXX1234',
+  annual_income: '0',
+  salary: '0',
+  income_type: 'Individual',
+  created_at: new Date().toISOString()
+};
+
 const Home = () => {
+  const [userData, setUserData] = useState(defaultUserData);
+  const [loading, setLoading] = useState(true);
+
+  // Calculate tax rate based on annual income
+  const calculateTaxRate = (annualIncome) => {
+    const income = parseFloat(annualIncome.replace(/[^0-9.]/g, ''));
+    if (income <= 250000) return 0;
+    if (income <= 500000) return 5;
+    if (income <= 750000) return 10;
+    if (income <= 1000000) return 15;
+    if (income <= 1250000) return 20;
+    if (income <= 1500000) return 25;
+    return 30;
+  };
+
   const chartData = React.useMemo(() => ({
     savings: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -89,7 +116,8 @@ const Home = () => {
     }
   }), []);
 
-  const chartOptions = React.useMemo(() => ({
+  // Update chart options for better formatting
+  const lineBarOptions = React.useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -98,6 +126,10 @@ const Home = () => {
         labels: {
           padding: 20,
           usePointStyle: true,
+          font: {
+            size: 14,
+            weight: '500'
+          }
         }
       },
       tooltip: {
@@ -110,16 +142,82 @@ const Home = () => {
       x: {
         grid: {
           display: false
+        },
+        ticks: {
+          font: {
+            size: 14
+          }
         }
       },
       y: {
         beginAtZero: true,
         grid: {
           color: 'rgba(0, 0, 0, 0.1)'
+        },
+        ticks: {
+          font: {
+            size: 14
+          },
+          callback: function(value) {
+            return value >= 1000 ? `₹${(value / 1000).toFixed(0)}k` : `₹${value}`;
+          }
+        }
+      }
+    },
+    layout: {
+      padding: {
+        left: 10,
+        right: 10
+      }
+    }
+  }), []);
+
+  // Separate options for pie/doughnut charts (no axes)
+  const pieDonutOptions = React.useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+          font: {
+            size: 14,
+            weight: '500'
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `₹${context.raw.toLocaleString()}`
         }
       }
     }
   }), []);
+
+  // Update tax comparison data with more variability
+  const updatedChartData = React.useMemo(() => {
+    const taxData = {
+      // ... existing savings, deductions, income data ...
+      taxComparison: {
+        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        datasets: [
+          {
+            label: 'Tax Liability',
+            data: [55000, 42000, 38000, 45000],
+            backgroundColor: '#F472B6',
+          },
+          {
+            label: 'Amount Paid',
+            data: [55000, 42000, 15000, 0],
+            backgroundColor: '#60A5FA',
+          }
+        ]
+      }
+    };
+    return { ...chartData, taxComparison: taxData.taxComparison };
+  }, [chartData]);
 
   const heroStyle = {
     backgroundImage: "url('/hero.jpg')",
@@ -130,28 +228,95 @@ const Home = () => {
     minHeight: '100vh',
   };
 
-  const summaryCards = React.useMemo(() => [
-    {
-      icon: '👤',
-      title: 'Personal Overview',
-      bgColor: 'var(--card-accent-1)',
-      items: [
-        { label: 'Tax ID', value: 'XXXXX1234' },
-        { label: 'Filing Status', value: 'Individual' },
-        { label: 'Tax Year', value: '2024' }
-      ]
-    },
-    {
-      icon: '💰',
-      title: 'Tax Summary',
-      bgColor: 'var(--card-accent-2)',
-      items: [
-        { label: 'Annual Income', value: '₹75,00,000' },
-        { label: 'Tax Rate', value: '22%' },
-        { label: 'Est. Tax Due', value: '₹16,50,000' }
-      ]
-    }
-  ], []);
+  // Fetch user data from Firestore
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const currentUser = auth.currentUser;
+        
+        if (!currentUser) {
+          console.log("No user logged in");
+          setUserData(defaultUserData);
+          return;
+        }
+
+        const userDocRef = doc(db, "Users", currentUser.uid);
+        const userSnapshot = await getDoc(userDocRef);
+
+        if (userSnapshot.exists()) {
+          const data = userSnapshot.data();
+          setUserData({
+            ...defaultUserData,
+            ...data,
+            joinDate: new Date(data.created_at).toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric'
+            })
+          });
+        } else {
+          console.log("No user document found");
+          setUserData(defaultUserData);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setUserData(defaultUserData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Add auth state listener
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchUserData();
+      } else {
+        setUserData(defaultUserData);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Update summaryCards using user data
+  const summaryCards = React.useMemo(() => {
+    return [
+      {
+        icon: '👤',
+        title: 'Personal Overview',
+        bgColor: 'var(--card-accent-1)',
+        items: [
+          { label: 'Tax ID', value: userData.ssn || 'XXXXX1234' },
+          { label: 'Filing Status', value: userData.income_type || 'Individual' },
+          { label: 'Tax Year', value: '2024' }
+        ]
+      },
+      {
+        icon: '💰',
+        title: 'Tax Summary',
+        bgColor: 'var(--card-accent-2)',
+        items: [
+          { 
+            label: 'Annual Income', 
+            value: userData.annual_income ? 
+              `₹${parseFloat(userData.annual_income).toLocaleString()}` : 
+              '₹0' 
+          },
+          { 
+            label: 'Monthly Salary', 
+            value: userData.salary ? 
+              `₹${parseFloat(userData.salary).toLocaleString()}` : 
+              '₹0' 
+          },
+          { 
+            label: 'Tax Rate', 
+            value: `${calculateTaxRate(userData.annual_income || '0')}%` 
+          }
+        ]
+      }
+    ];
+  }, [userData]);
 
   const features = React.useMemo(() => [
     {
@@ -198,62 +363,72 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Modified Overview Section - Charts Only */}
-      <section className="overview-section fade-in">
-        <h2>Your Personal Tax Dashboard</h2>
-        <div className="charts-scroll-container">
-          <div className="charts-scroll-grid">
-            {/* Charts Only - Remove Info Cards */}
-            <div className="chart-card">
-              <h3>Your Tax Savings Growth</h3>
-              <div className="chart-container">
-                <Line data={chartData.savings} options={chartOptions} />
+      {/* Charts Section - Only show for logged in users */}
+      {auth.currentUser && (
+        <section className="overview-section fade-in">
+          <h2 className="dashboard-title">Your Personal Tax Dashboard</h2>
+          <div className="charts-scroll-container">
+            <div className="charts-scroll-grid">
+              <div className="chart-card">
+                <h3>Your Tax Savings Growth</h3>
+                <div className="chart-container">
+                  <Line data={updatedChartData.savings} options={lineBarOptions} />
+                </div>
               </div>
-            </div>
-            <div className="chart-card">
-              <h3>Your Deductions Breakdown</h3>
-              <div className="chart-container">
-                <Doughnut data={chartData.deductions} options={chartOptions} />
+              <div className="chart-card">
+                <h3>Your Deductions Breakdown</h3>
+                <div className="chart-container">
+                  <Doughnut data={updatedChartData.deductions} options={pieDonutOptions} />
+                </div>
               </div>
-            </div>
-            <div className="chart-card">
-              <h3>Your Income Sources</h3>
-              <div className="chart-container">
-                <Pie data={chartData.income} options={chartOptions} />
+              <div className="chart-card">
+                <h3>Your Income Sources</h3>
+                <div className="chart-container">
+                  <Pie data={updatedChartData.income} options={pieDonutOptions} />
+                </div>
               </div>
-            </div>
-            <div className="chart-card">
-              <h3>Your Tax Payment Status</h3>
-              <div className="chart-container">
-                <Bar data={chartData.taxComparison} options={chartOptions} />
+              <div className="chart-card">
+                <h3>Your Tax Payment Status</h3>
+                <div className="chart-container">
+                  <Bar data={updatedChartData.taxComparison} options={lineBarOptions} />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* New Summary Section with Title */}
-      <section className="summary-section fade-in">
-        <h2 className="summary-title">Your Tax Profile Overview</h2>
-        <div className="summary-container">
-          {summaryCards.map((card, index) => (
-            <div key={index} className="summary-card" style={{ background: card.bgColor }}>
-              <div className="summary-header">
-                <span className="summary-icon">{card.icon}</span>
-                <h3>{card.title}</h3>
+      {/* Summary Section - Only show for logged in users */}
+      {auth.currentUser && (
+        <section className="summary-section fade-in">
+          <h2 className="summary-title">Your Tax Profile Overview</h2>
+          <div className="summary-container">
+            {loading ? (
+              <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading your tax profile...</p>
               </div>
-              <div className="summary-content">
-                {card.items.map((item, i) => (
-                  <div key={i} className="summary-item">
-                    <span className="summary-label">{item.label}</span>
-                    <span className="summary-value">{item.value}</span>
+            ) : (
+              summaryCards.map((card, index) => (
+                <div key={index} className="summary-card" style={{ background: card.bgColor }}>
+                  <div className="summary-header">
+                    <span className="summary-icon">{card.icon}</span>
+                    <h3>{card.title}</h3>
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+                  <div className="summary-content">
+                    {card.items.map((item, i) => (
+                      <div key={i} className="summary-item">
+                        <span className="summary-label">{item.label}</span>
+                        <span className="summary-value">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Enhanced Features Section */}
       <section className="features-section">
