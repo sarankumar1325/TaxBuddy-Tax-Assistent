@@ -7,9 +7,25 @@ const TaxMentor = () => {
     <div className="tax-mentor-page">
       <header className="mentor-header">
         <div className="mentor-header-content">
-          <FaUserGraduate className="mentor-icon" />
-          <h1>Tax Mentor</h1>
-          <p>Get personalized guidance from our expert tax mentoring system</p>
+          <div className="header-icon-container">
+            <FaUserGraduate className="mentor-icon" />
+          </div>
+          <h1>Welcome to Tax Mentor</h1>
+          <p className="header-description">Your personal AI tax assistant is here to help you navigate through complex tax matters</p>
+          <div className="feature-badges">
+            <div className="badge">
+              <FaChartLine />
+              <span>Smart Analysis</span>
+            </div>
+            <div className="badge">
+              <FaFileAlt />
+              <span>Tax Guidance</span>
+            </div>
+            <div className="badge">
+              <FaUserGraduate />
+              <span>Expert Support</span>
+            </div>
+          </div>
         </div>
       </header>
 
