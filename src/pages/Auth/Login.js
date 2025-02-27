@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebase';
 import "../../styles/Auth.css";
 
 const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(location.state?.message || '');
 
   const handleChange = (e) => {
     setFormData({
@@ -18,33 +24,54 @@ const Login = ({ setIsLoggedIn }) => {
     setError('');
   };
 
-  const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return regex.test(password);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.email.includes('@')) {
-      setError('Please enter a valid email address');
-      return;
-    }
+    setLoading(true);
+    setError('');
 
-    if (!validatePassword(formData.password)) {
-      setError('Password must be at least 8 characters and include uppercase, lowercase, number and special character');
-      return;
-    }
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
 
-    // Add your login logic here
-    setIsLoggedIn(true);
-    navigate('/');
+      // Update last login time
+      await updateDoc(doc(db, "Users", userCredential.user.uid), {
+        last_login: new Date().toISOString()
+      });
+
+      setIsLoggedIn(true);
+      navigate('/');
+    } catch (error) {
+      console.error("Error during login:", error);
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setError('No account exists with this email');
+          break;
+        case 'auth/wrong-password':
+          setError('Invalid password');
+          break;
+        case 'auth/invalid-email':
+          setError('Invalid email address');
+          break;
+        default:
+          setError('Failed to login. Please check your credentials.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h2>Welcome Back</h2>
+        {successMessage && (
+          <div className="success-message">
+            {successMessage}
+          </div>
+        )}
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -69,7 +96,13 @@ const Login = ({ setIsLoggedIn }) => {
               required
             />
           </div>
-          <button type="submit" className="submit-btn login-btn">Login</button>
+          <button 
+            type="submit" 
+            className="submit-btn login-btn"
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
         <p className="auth-footer">
           Don't have an account? <Link to="/signup">Sign Up</Link>

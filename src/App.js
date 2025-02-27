@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from './firebase';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -20,6 +22,14 @@ const AppContent = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const toggleTheme = () => setIsDarkTheme(!isDarkTheme);
   const handleLogout = () => setIsLoggedIn(false);
@@ -45,7 +55,7 @@ const AppContent = () => {
           <Route path="/settings" element={<Settings />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="/signup" element={<SignUp setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/signup" element={<SignUp />} /> {/* Remove setIsLoggedIn prop */}
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/social" element={<Social />} />
           <Route path="/tax-mentor" element={<TaxMentor />} />

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaSun, FaMoon, FaBars, FaTimes, FaBell, FaCog, FaUser, FaUsers } from 'react-icons/fa';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import '../styles/Header.css';
 
-const Header = ({ theme, toggleTheme }) => {
+const Header = ({ theme, toggleTheme, isLoggedIn, setIsLoggedIn }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -12,6 +15,16 @@ const Header = ({ theme, toggleTheme }) => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (
@@ -61,12 +74,20 @@ const Header = ({ theme, toggleTheme }) => {
             </Link>
           </div>
           <div className="auth-group" style={{ display: 'flex', gap: '0.5rem' }}>
-            <Link to="/login" className="auth-link" onClick={closeMenu}>
-              Login
-            </Link>
-            <Link to="/signup" className="auth-link signup-btn" onClick={closeMenu}>
-              Sign Up
-            </Link>
+            {isLoggedIn ? (
+              <button onClick={handleLogout} className="auth-link logout-btn">
+                Logout
+              </button>
+            ) : (
+              <>
+                <Link to="/login" className="auth-link" onClick={closeMenu}>
+                  Login
+                </Link>
+                <Link to="/signup" className="auth-link signup-btn" onClick={closeMenu}>
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
