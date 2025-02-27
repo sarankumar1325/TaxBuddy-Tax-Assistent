@@ -646,6 +646,8 @@
   --border-color: #eaeaea;
   --accent-color: #4299e1;
   --accent-hover: #3182ce;
+  --chart-text: #1a202c;
+  --chart-text-secondary: #4a5568;
 }
 
 .app.dark {
@@ -657,6 +659,8 @@
   --border-color: #333333;
   --accent-color: #4299e1;
   --accent-hover: #3182ce;
+  --chart-text: #ffffff;
+  --chart-text-secondary: #e2e8f0;
 }
 
 /* Update section backgrounds */
@@ -824,6 +828,11 @@
   background: var(--background-primary);
 }
 
+.overview-section h2 {
+  font-size: 1.75rem;  /* Reduced from 2.5rem */
+  margin-bottom: 1.5rem;
+}
+
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -869,11 +878,15 @@
 
 /* Horizontal Scrollable Charts */
 .charts-scroll-container {
-  width: 100%;
+  width: 95%;
+  margin: 0 auto;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  padding: 1rem 0;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .charts-scroll-container::-webkit-scrollbar {
@@ -891,46 +904,32 @@
 }
 
 .charts-scroll-grid {
-  display: flex;
-  gap: 2rem;
+  display: flex;  /* Changed from grid to flex */
+  gap: 1.5rem;
   padding: 0.5rem;
-  min-width: min-content;
+  width: max-content;  /* Allow container to grow based on content */
 }
 
 .chart-card {
-  min-width: 400px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  border: 1px solid var(--border-color);
+  min-width: 400px;  /* Set fixed minimum width for each chart */
+  flex: 1;  /* Allow equal growth */
+  max-width: 500px;  /* Prevent cards from getting too wide */
 }
 
-.chart-container {
-  height: 300px;
-  margin: 1rem 0;
-}
-
-.chart-card h3 {
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-  text-align: center;
-}
-
-.chart-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 768px) {
+@media (max-width: 1600px) {
   .chart-card {
-    min-width: 300px;
+    min-width: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .charts-scroll-container {
+    width: 100%;
+    padding: 1rem;
   }
   
-  .chart-container {
-    height: 250px;
+  .chart-card {
+    min-width: 300px;
   }
 }
 
@@ -1207,4 +1206,34 @@
   height: 3px;
   background: var(--accent-color);
   border-radius: 2px;
+}
+
+/* Enhanced Dashboard Text Visibility */
+.overview-section h2 {
+  font-size: 1.75rem;  /* Reduced from 2.5rem */
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.chart-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* Enhanced Chart Labels */
+.chart-container {
+  height: 300px;
+  margin: 1rem 0;
+}
+
+.chart-container canvas {
+  font-size: 14px !important;
+  font-weight: 500 !important;
 }

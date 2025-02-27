@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { FaVideo, FaQuestionCircle, FaCertificate, FaGraduationCap, FaArrowLeft, FaCheck, FaLock, FaPlay, FaFile, FaBook, FaLightbulb, FaTrophy } from 'react-icons/fa';
 import '../styles/Learn.css';
+import Quiz from '../components/Quiz';
 
 const Learn = () => {
   const [activeTab, setActiveTab] = useState('courses');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [activeModule, setActiveModule] = useState(null);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   const courses = [
     {
@@ -14,7 +16,7 @@ const Learn = () => {
       description: "Master the basics of personal and business taxation",
       duration: "4 weeks",
       level: "Beginner",
-      progress: 0,
+      progress: 40, // Changed from 0 to 40
       modules: ["Tax Basics", "Filing Requirements", "Deductions", "Credits"],
       icon: <FaGraduationCap />
     },
@@ -24,7 +26,7 @@ const Learn = () => {
       description: "Strategic tax optimization techniques for professionals",
       duration: "6 weeks",
       level: "Advanced",
-      progress: 35,
+      progress: 0, // Changed from 35 to 0
       modules: ["Investment Tax", "Estate Planning", "International Tax", "Business Tax"],
       icon: <FaVideo />
     }
@@ -356,11 +358,18 @@ const Learn = () => {
                     <span key={i} className="topic-tag">{topic}</span>
                   ))}
                 </div>
-                <button className="start-quiz-button glow">Take Quiz</button>
+                <button 
+                  className="start-quiz-button glow"
+                  onClick={() => setShowQuiz(true)}
+                >
+                  Take Quiz
+                </button>
               </div>
             ))}
           </div>
         )}
+
+        {showQuiz && <Quiz onClose={() => setShowQuiz(false)} />}
 
         {activeTab === 'certificates' && (
           <div className="certificates-grid">

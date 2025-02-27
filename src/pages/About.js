@@ -68,8 +68,48 @@ const About = () => {
     }
   ];
 
-  // Comment out or remove teamMembers array if not needed
-  /* const teamMembers = [...] */
+  const teamMembers = [
+    {
+      name: "Saran kumar S",
+      role: "Gen AI Developer",
+      image: "./team/saran.jpg",
+      social: {
+        linkedin: "https://linkedin.com/in/akash-patel",
+        github: "https://github.com/akashp",
+        email: "akash@taxbuddy.com"
+      }
+    },
+    {
+      name: "Gobika R",
+      role: "Gen AI Developer",
+      image: "./team/gopika.jpg",
+      social: {
+        linkedin: "https://linkedin.com/in/priya-sharma",
+        github: "https://github.com/priyas",
+        email: "priya@taxbuddy.com"
+      }
+    },
+    {
+      name: "Murugan B",
+      role: "Full stack Developer",
+      image: "./team/Murugan.jpg",
+      social: {
+        linkedin: "https://linkedin.com/in/raj-kumar",
+        github: "https://github.com/rajk",
+        email: "raj@taxbuddy.com"
+      }
+    },
+    {
+      name: "Sathya S",
+      role: "Full stack Developer",
+      image: "./team/sathya.jpg",
+      social: {
+        linkedin: "https://linkedin.com/in/neha-singh",
+        github: "https://github.com/nehas",
+        email: "neha@taxbuddy.com"
+      }
+    }
+  ];
 
   const [contactForm, setContactForm] = useState({
     name: '',
@@ -195,34 +235,37 @@ const About = () => {
         </div>
       </section>
 
-      {/* Comment out Team Section
       <section className="about-section team-section">
         <h2>Meet Our Team</h2>
-        <div className="team-grid">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="team-card">
-              <div className="team-member-image">
-                <img src={member.image} alt={member.name} />
+        <div className="team-container">
+          <div className="team-grid">
+            {teamMembers.map((member, index) => (
+              <div 
+                key={index} 
+                className="team-card"
+                style={{ '--index': index }}
+              >
+                <div className="team-member-image">
+                  <img src={member.image} alt={member.name} />
+                </div>
+                <h3>{member.name}</h3>
+                <span className="member-role">{member.role}</span>
+                <div className="member-social">
+                  <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer">
+                    <FaLinkedin />
+                  </a>
+                  <a href={member.social.github} target="_blank" rel="noopener noreferrer">
+                    <FaGithub />
+                  </a>
+                  <a href={`mailto:${member.social.email}`}>
+                    <FaEnvelope />
+                  </a>
+                </div>
               </div>
-              <h3>{member.name}</h3>
-              <span className="member-role">{member.role}</span>
-              <p className="member-bio">{member.bio}</p>
-              <div className="member-social">
-                <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer">
-                  <FaLinkedin />
-                </a>
-                <a href={member.social.github} target="_blank" rel="noopener noreferrer">
-                  <FaGithub />
-                </a>
-                <a href={`mailto:${member.social.email}`}>
-                  <FaEnvelope />
-                </a>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
-      */}
 
       <section className="about-section contact-section">
         <h2>Get In Touch</h2>
