@@ -67,6 +67,54 @@
   transform: scale(1.1);
 }
 
+/* Add Lock Overlay Styles */
+.locked {
+  position: relative;
+  pointer-events: none;
+}
+
+.locked::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+  border-radius: 12px;
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.lock-icon {
+  font-size: 3rem;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.lock-overlay p {
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+/* Make content slightly visible when locked */
+.locked .nav-boxes {
+  filter: blur(4px);
+  opacity: 0.7;
+}
+
 @media (max-width: 768px) {
   .nav-boxes {
     grid-template-columns: 1fr;

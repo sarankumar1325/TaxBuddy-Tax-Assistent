@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import "../../styles/Auth.css";
 
@@ -35,6 +35,10 @@ const Login = ({ setIsLoggedIn }) => {
         formData.email,
         formData.password
       );
+
+      // Debug log to verify user data
+      const userDoc = await getDoc(doc(db, "Users", userCredential.user.uid));
+      console.log("User data after login:", userDoc.data());
 
       // Update last login time
       await updateDoc(doc(db, "Users", userCredential.user.uid), {

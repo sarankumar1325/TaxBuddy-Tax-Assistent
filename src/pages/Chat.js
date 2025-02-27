@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaUserGraduate, FaBrain, FaArrowRight } from 'react-icons/fa';
+import { FaUserGraduate, FaBrain, FaArrowRight, FaLock } from 'react-icons/fa';
+import { auth } from '../firebase';
 import '../styles/Chat.css';
 
 const Chat = () => {
   return (
     <div className="chat-page">
-      <section className="chat-navigation">
+      <section className={`chat-navigation ${!auth.currentUser ? 'locked' : ''}`}>
         <div className="nav-boxes">
           {/* Tax Mentor Box */}
           <Link to="/tax-mentor" className="nav-box mentor">
@@ -24,6 +25,12 @@ const Chat = () => {
             <FaArrowRight className="nav-arrow" />
           </Link>
         </div>
+        {!auth.currentUser && (
+          <div className="lock-overlay">
+            <FaLock className="lock-icon" />
+            <p>Sign in to access chat features</p>
+          </div>
+        )}
       </section>
 
       {/* Rest of the chat interface */}

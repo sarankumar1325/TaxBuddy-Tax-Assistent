@@ -1,54 +1,153 @@
-import React, { useState, useRef } from 'react';
-import { FaUser, FaEnvelope, FaPhone, FaIdCard, FaFileAlt, FaEdit, FaDownload, FaSave, FaTimes } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from 'react';
+import { FaUser, FaEnvelope, FaPhone, FaIdCard, FaFileAlt, FaEdit, FaDownload, FaSave, FaTimes, FaBuilding, FaMapMarker, FaPlus, FaChartLine, FaMoneyBillAlt, FaBriefcase } from 'react-icons/fa';
+import { auth, db } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import '../styles/Profile.css';
+
+const defaultUserData = {
+  name: 'Not set',
+  email: 'Not set',
+  phone: 'Not set',
+  business_email: 'Not set',
+  company_name: 'Not set',
+  address: 'Not set',
+  ssn: 'Not set',
+  created_at: new Date().toISOString(),
+  last_login: new Date().toISOString(),
+  account_status: 'inactive',
+  avatar: 'https://via.placeholder.com/150',
+  tax_reports: [
+    {
+      id: 'TR001',
+      year: '2023',
+      status: 'Pending',
+      amount: '₹0',
+      date: new Date().toISOString(),
+      description: 'Annual Tax Filing'
+    }
+  ],
+  annual_income: 'Not set',
+  salary: 'Not set',
+  income_currency: 'INR',
+  income_type: 'Salaried', // or 'Self-Employed', 'Business'
+  last_updated: new Date().toISOString()
+};
 
 const Profile = () => {
   const fileInputRef = useRef(null);
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "(555) 123-4567",
-    ssn: "XXX-XX-1234",
-    avatar: "https://via.placeholder.com/150",
-    occupation: "Software Engineer",
-    address: "123 Tax Street, Finance City, FC 12345",
-    joinDate: "January 2024"
-  });
-
+  const [user, setUser] = useState(defaultUserData);
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({});
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [editingReport, setEditingReport] = useState(null);
+  const [editedReport, setEditedReport] = useState(null);
 
-  const [taxReports] = useState([
-    {
-      year: "2023",
-      status: "Filed",
-      amount: "$2,500",
-      date: "2024-01-15",
-      id: "TX2023001"
-    },
-    {
-      year: "2022",
-      status: "Completed",
-      amount: "$1,800",
-      date: "2023-03-20",
-      id: "TX2022001"
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const currentUser = auth.currentUser;
+        
+        if (!currentUser) {
+          console.log("No user logged in");
+          return;
+        }
+
+        console.log("Current User UID:", currentUser.uid); // Debug log
+
+        const userDocRef = doc(db, "Users", currentUser.uid);
+        const userSnapshot = await getDoc(userDocRef);
+
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          console.log("Fetched user data:", userData); // Debug log
+
+          setUser({
+            ...defaultUserData,
+            ...userData,
+            joinDate: new Date(userData.created_at).toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric'
+            })
+          });
+        } else {
+          console.log("No user document found");
+          setUser(defaultUserData);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setUser(defaultUserData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Add auth state listener
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchUserData();
+      } else {
+        setUser(defaultUserData);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSave = async () => {
+    if (!auth.currentUser) return;
+
+    try {
+      const updateData = {
+        ...editedUser,
+        updated_at: new Date().toISOString()
+      };
+
+      // Remove undefined or null values
+      Object.keys(updateData).forEach(key => 
+        (updateData[key] === undefined || updateData[key] === null) && delete updateData[key]
+      );
+
+      await updateDoc(doc(db, "Users", auth.currentUser.uid), updateData);
+
+      setUser(prev => ({
+        ...prev,
+        ...updateData
+      }));
+      setIsEditing(false);
+      setErrors({});
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setErrors({ submit: 'Failed to update profile' });
     }
-  ]);
+  };
 
   const handleAvatarClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser(prev => ({
-          ...prev,
-          avatar: reader.result
-        }));
+      reader.onloadend = async () => {
+        const imageData = reader.result;
+        try {
+          // Update Firestore with the new image
+          await updateDoc(doc(db, "Users", auth.currentUser.uid), {
+            avatar: imageData
+          });
+          
+          // Update local state
+          setUser(prev => ({
+            ...prev,
+            avatar: imageData
+          }));
+        } catch (error) {
+          console.error("Error updating avatar:", error);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -90,6 +189,13 @@ const Profile = () => {
       
       case 'address':
         return value ? '' : 'Address is required';
+
+      case 'annual_income':
+      case 'salary':
+        const numValue = parseFloat(value.replace(/[^0-9.]/g, ''));
+        if (isNaN(numValue)) return 'Please enter a valid number';
+        if (numValue < 0) return 'Amount cannot be negative';
+        return '';
       
       default:
         return '';
@@ -105,23 +211,6 @@ const Profile = () => {
       ...prev,
       [field]: validateField(field, value)
     }));
-  };
-
-  const handleSave = () => {
-    const newErrors = {};
-    ['email', 'phone', 'ssn', 'address'].forEach(field => {
-      const error = validateField(field, editedUser[field]);
-      if (error) newErrors[field] = error;
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setUser(editedUser);
-    setIsEditing(false);
-    setErrors({});
   };
 
   const handleCancel = () => {
@@ -165,57 +254,148 @@ const Profile = () => {
     document.body.removeChild(link);
   };
 
+  const handleEditReport = (report) => {
+    setEditingReport(report.id);
+    setEditedReport({ ...report });
+  };
+
+  const handleSaveReport = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser || !editedReport) return;
+
+      const updatedReports = user.tax_reports.map(report => 
+        report.id === editingReport ? editedReport : report
+      );
+
+      await updateDoc(doc(db, "Users", currentUser.uid), {
+        tax_reports: updatedReports
+      });
+
+      setUser(prev => ({
+        ...prev,
+        tax_reports: updatedReports
+      }));
+      setEditingReport(null);
+      setEditedReport(null);
+    } catch (error) {
+      console.error("Error updating tax report:", error);
+    }
+  };
+
+  const handleAddReport = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      const newReport = {
+        id: `TR${Date.now()}`,
+        year: new Date().getFullYear().toString(),
+        status: 'Pending',
+        amount: '₹0',
+        date: new Date().toISOString(),
+        description: 'New Tax Report'
+      };
+
+      const updatedReports = [...(user.tax_reports || []), newReport];
+
+      // Update Firestore
+      await updateDoc(doc(db, "Users", currentUser.uid), {
+        tax_reports: updatedReports
+      });
+
+      // Update local state
+      setUser(prev => ({
+        ...prev,
+        tax_reports: updatedReports
+      }));
+
+      // Start editing the new report
+      setEditingReport(newReport.id);
+      setEditedReport(newReport);
+    } catch (error) {
+      console.error("Error adding new tax report:", error);
+    }
+  };
+
+  const formatCurrency = (value) => {
+    if (!value || value === 'Not set') return 'Not set';
+    const number = parseFloat(value.replace(/[^0-9.]/g, ''));
+    if (isNaN(number)) return value;
+    return `₹${number.toLocaleString('en-IN')}`;
+  };
+
   const renderPersonalInfo = () => (
     <section className="profile-section">
-      <h2>
-        <FaUser />
-        Personal Information
-      </h2>
+      <div className="section-header">
+        <h2><FaUser /> Personal Information</h2>
+        {!isEditing && (
+          <button className="section-edit-button" onClick={handleEditClick}>
+            <FaEdit /> Edit
+          </button>
+        )}
+      </div>
       <div className="info-grid">
-        {isEditing ? (
+        {loading ? (
+          <div>Loading user information...</div>
+        ) : isEditing ? (
           <>
+            {/* Edit mode - show all input fields */}
+            {['name', 'email', 'phone', 'business_email', 'company_name', 'address', 'ssn'].map(field => (
+              <div key={field} className="info-item">
+                <label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')}</label>
+                <input
+                  type={field === 'email' || field === 'business_email' ? 'email' : 'text'}
+                  id={field}
+                  value={editedUser[field] || ''}
+                  onChange={(e) => handleInputChange(field, e.target.value)}
+                  className={`edit-input ${errors[field] ? 'error' : ''}`}
+                />
+                {errors[field] && <span className="error-message">{errors[field]}</span>}
+              </div>
+            ))}
+
+            {/* New income fields */}
             <div className="info-item">
-              <label>Email</label>
-              <input
-                type="email"
-                value={editedUser.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`edit-input ${errors.email ? 'error' : ''}`}
-              />
-              {errors.email && <span className="error-message">{errors.email}</span>}
-            </div>
-            <div className="info-item">
-              <label>Phone</label>
-              <input
-                type="tel"
-                value={editedUser.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                className={`edit-input ${errors.phone ? 'error' : ''}`}
-                placeholder="(XXX) XXX-XXXX"
-              />
-              {errors.phone && <span className="error-message">{errors.phone}</span>}
-            </div>
-            <div className="info-item">
-              <label>SSN</label>
+              <label htmlFor="annual_income">Annual Income</label>
               <input
                 type="text"
-                value={editedUser.ssn}
-                onChange={(e) => handleInputChange('ssn', e.target.value)}
-                className={`edit-input ${errors.ssn ? 'error' : ''}`}
-                placeholder="XXX-XX-XXXX"
+                id="annual_income"
+                value={editedUser.annual_income || ''}
+                onChange={(e) => handleInputChange('annual_income', e.target.value)}
+                className={`edit-input ${errors.annual_income ? 'error' : ''}`}
+                placeholder="Enter annual income"
               />
-              {errors.ssn && <span className="error-message">{errors.ssn}</span>}
+              {errors.annual_income && <span className="error-message">{errors.annual_income}</span>}
             </div>
+
             <div className="info-item">
-              <label>Address</label>
+              <label htmlFor="salary">Monthly Salary</label>
               <input
                 type="text"
-                value={editedUser.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                className={`edit-input ${errors.address ? 'error' : ''}`}
+                id="salary"
+                value={editedUser.salary || ''}
+                onChange={(e) => handleInputChange('salary', e.target.value)}
+                className={`edit-input ${errors.salary ? 'error' : ''}`}
+                placeholder="Enter monthly salary"
               />
-              {errors.address && <span className="error-message">{errors.address}</span>}
+              {errors.salary && <span className="error-message">{errors.salary}</span>}
             </div>
+
+            <div className="info-item">
+              <label htmlFor="income_type">Income Type</label>
+              <select
+                id="income_type"
+                value={editedUser.income_type || 'Salaried'}
+                onChange={(e) => handleInputChange('income_type', e.target.value)}
+                className="edit-input"
+              >
+                <option value="Salaried">Salaried</option>
+                <option value="Self-Employed">Self-Employed</option>
+                <option value="Business">Business</option>
+              </select>
+            </div>
+
             <div className="edit-actions">
               <button className="save-button" onClick={handleSave}>
                 <FaSave /> Save Changes
@@ -227,33 +407,50 @@ const Profile = () => {
           </>
         ) : (
           <>
+            {/* View mode - show all fields */}
+            {[
+              { label: 'Name', value: user.name, icon: <FaUser /> },
+              { label: 'Email', value: user.email, icon: <FaEnvelope /> },
+              { label: 'Phone', value: user.phone, icon: <FaPhone /> },
+              { label: 'Business Email', value: user.business_email, icon: <FaEnvelope /> },
+              { label: 'Company Name', value: user.company_name, icon: <FaBuilding /> },
+              { label: 'Address', value: user.address, icon: <FaMapMarker /> },
+              { label: 'SSN', value: user.ssn, icon: <FaIdCard /> }
+            ].map(item => (
+              <div key={item.label} className="info-item">
+                <label>{item.label}</label>
+                <div className="info-value">
+                  {item.icon}
+                  {item.value || 'Not set'}
+                </div>
+              </div>
+            ))}
+
+            {/* New income fields in view mode */}
             <div className="info-item">
-              <label>Email</label>
+              <label>Annual Income</label>
               <div className="info-value">
-                <FaEnvelope />
-                {user.email}
+                <FaChartLine />
+                {formatCurrency(user.annual_income)}
               </div>
             </div>
+
             <div className="info-item">
-              <label>Phone</label>
+              <label>Monthly Salary</label>
               <div className="info-value">
-                <FaPhone />
-                {user.phone}
+                <FaMoneyBillAlt />
+                {formatCurrency(user.salary)}
               </div>
             </div>
+
             <div className="info-item">
-              <label>SSN</label>
+              <label>Income Type</label>
               <div className="info-value">
-                <FaIdCard />
-                {user.ssn}
+                <FaBriefcase />
+                {user.income_type || 'Not set'}
               </div>
             </div>
-            <div className="info-item">
-              <label>Address</label>
-              <div className="info-value">
-                {user.address}
-              </div>
-            </div>
+
             <button className="edit-button" onClick={handleEditClick}>
               <FaEdit /> Edit Information
             </button>
@@ -266,44 +463,88 @@ const Profile = () => {
   const renderTaxReports = () => (
     <section className="profile-section">
       <h2>
-        <FaFileAlt />
-        Recent Tax Reports
+        <FaFileAlt /> Recent Tax Reports
+        <button className="add-report-btn" onClick={() => handleAddReport()}>
+          <FaPlus /> Add Report
+        </button>
       </h2>
       <div className="tax-reports">
-        {taxReports.map(report => (
+        {user.tax_reports?.map(report => (
           <div key={report.id} className="tax-report-card">
-            <div className="report-header">
-              <span className="year">{report.year}</span>
-              <span className={`status ${report.status.toLowerCase()}`}>
-                {report.status}
-              </span>
-            </div>
-            <div className="report-details">
-              <div className="report-info">
-                <label>Amount</label>
-                <span>{report.amount}</span>
+            {editingReport === report.id ? (
+              // Edit mode for report
+              <div className="report-edit-form">
+                <input
+                  type="text"
+                  value={editedReport.year}
+                  onChange={(e) => setEditedReport({...editedReport, year: e.target.value})}
+                  placeholder="Year"
+                />
+                <select
+                  value={editedReport.status}
+                  onChange={(e) => setEditedReport({...editedReport, status: e.target.value})}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Filed">Filed</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <input
+                  type="text"
+                  value={editedReport.amount}
+                  onChange={(e) => setEditedReport({...editedReport, amount: e.target.value})}
+                  placeholder="Amount"
+                />
+                <div className="edit-actions">
+                  <button onClick={handleSaveReport} className="save-button">
+                    <FaSave /> Save
+                  </button>
+                  <button onClick={() => setEditingReport(null)} className="cancel-button">
+                    <FaTimes /> Cancel
+                  </button>
+                </div>
               </div>
-              <div className="report-info">
-                <label>Date Filed</label>
-                <span>{new Date(report.date).toLocaleDateString()}</span>
-              </div>
-              <div className="report-info">
-                <label>Report ID</label>
-                <span>{report.id}</span>
-              </div>
-            </div>
-            <button 
-              className="download-button"
-              onClick={() => handleDownload(report)}
-              title="Download to Desktop"
-            >
-              <FaDownload /> Download Report
-            </button>
+            ) : (
+              // View mode
+              <>
+                <div className="report-header">
+                  <span className="year">{report.year}</span>
+                  <span className={`status ${report.status.toLowerCase()}`}>
+                    {report.status}
+                  </span>
+                </div>
+                <div className="report-details">
+                  <div className="report-info">
+                    <label>Amount</label>
+                    <span>{report.amount}</span>
+                  </div>
+                  <div className="report-info">
+                    <label>Date Filed</label>
+                    <span>{new Date(report.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className="report-info">
+                    <label>Report ID</label>
+                    <span>{report.id}</span>
+                  </div>
+                </div>
+                <div className="report-actions">
+                  <button onClick={() => handleEditReport(report)} className="edit-button">
+                    <FaEdit /> Edit
+                  </button>
+                  <button onClick={() => handleDownload(report)} className="download-button">
+                    <FaDownload /> Download
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
     </section>
   );
+
+  if (loading) {
+    return <div className="loading">Loading profile...</div>;
+  }
 
   return (
     <div className="profile-container">
@@ -311,7 +552,11 @@ const Profile = () => {
         <div className="profile-cover"></div>
         <div className="profile-avatar-section">
           <div className="profile-avatar-container">
-            <img src={user.avatar} alt={user.name} className="profile-avatar" />
+            <img 
+              src={user.avatar || defaultUserData.avatar} 
+              alt={user.name || 'Profile'} 
+              className="profile-avatar" 
+            />
             <div className="profile-edit-overlay" onClick={handleAvatarClick}>
               <FaEdit size={16} />
             </div>
@@ -324,7 +569,7 @@ const Profile = () => {
             />
           </div>
           <div className="profile-title">
-            <h1>{user.name}</h1>
+            <h1>{user.name || 'Not set'}</h1>
             <p className="join-date">Member since {user.joinDate}</p>
           </div>
         </div>

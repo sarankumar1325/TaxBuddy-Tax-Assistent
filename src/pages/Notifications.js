@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaBell, FaCheck, FaTrash } from 'react-icons/fa';
+import { auth } from '../firebase';
 import '../styles/Notifications.css';
 
 const Notifications = () => {
@@ -48,13 +49,15 @@ const Notifications = () => {
     <div className="notifications-container">
       <div className="notifications-header">
         <h1><FaBell /> Notifications</h1>
-        <button onClick={markAllAsRead} className="mark-all-button">
-          Mark all as read
-        </button>
+        {auth.currentUser && (
+          <button onClick={markAllAsRead} className="mark-all-button">
+            Mark all as read
+          </button>
+        )}
       </div>
 
       <div className="notifications-list">
-        {notifications.length === 0 ? (
+        {!auth.currentUser || notifications.length === 0 ? (
           <div className="no-notifications">
             <FaBell size={40} />
             <p>No notifications at this time</p>
@@ -94,4 +97,4 @@ const Notifications = () => {
   );
 };
 
-export default Notifications; 
+export default Notifications;

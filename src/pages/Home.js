@@ -1,10 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  FaRobot, FaChartLine, FaBook, FaBell, FaArrowRight, 
-  FaBrain, FaGraduationCap, // Add these icons
-  FaHome, FaComments, FaBuilding, FaCog, FaUser 
-} from 'react-icons/fa';
+import { FaRobot, FaChartLine, FaBook, FaBell, FaArrowRight, FaHome, FaComments, FaGraduationCap, FaBuilding, FaCog, FaUser } from 'react-icons/fa';
 import { Line, Doughnut, Pie, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -39,6 +35,10 @@ const Home = () => {
     savings: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
+        label: 'Your Tax Savings',
+        data: [1200, 1900, 2400, 2800, 3200, 4200].map(val => val * 80), // Converting to approximate rupees
+        borderColor: '#10B981',
+        tension: 0.4,
         fill: true,
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
       }]

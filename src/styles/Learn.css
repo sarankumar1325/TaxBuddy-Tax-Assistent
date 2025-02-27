@@ -978,3 +978,71 @@
   from { background-position: 0 0; }
   to { background-position: 100% 100%; }
 }
+
+/* Add Lock Overlay Styles */
+.learning-content {
+  position: relative;
+}
+
+.locked {
+  pointer-events: none;
+}
+
+.locked::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+  border-radius: 12px;
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card-bg);
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  width: 90%;
+  max-width: 400px;
+}
+
+.lock-icon {
+  font-size: 4rem;
+  color: var(--accent-color);
+  margin-bottom: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+.lock-overlay p {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.6; transform: scale(1); }
+}
+
+/* Make content slightly visible when locked */
+.locked .learn-content,
+.locked .learn-navigation {
+  filter: blur(4px);
+  opacity: 0.7;
+}

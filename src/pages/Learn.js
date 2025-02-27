@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { FaVideo, FaQuestionCircle, FaCertificate, FaGraduationCap, FaArrowLeft, FaCheck, FaLock, FaPlay, FaFile, FaBook, FaLightbulb, FaTrophy } from 'react-icons/fa';
+import { auth } from '../firebase';
 import '../styles/Learn.css';
-import Quiz from '../components/Quiz';
 
 const Learn = () => {
   const [activeTab, setActiveTab] = useState('courses');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [activeModule, setActiveModule] = useState(null);
-  const [showQuiz, setShowQuiz] = useState(false);
 
   const courses = [
     {
@@ -16,7 +15,7 @@ const Learn = () => {
       description: "Master the basics of personal and business taxation",
       duration: "4 weeks",
       level: "Beginner",
-      progress: 40, // Changed from 0 to 40
+      progress: 0,
       modules: ["Tax Basics", "Filing Requirements", "Deductions", "Credits"],
       icon: <FaGraduationCap />
     },
@@ -26,7 +25,7 @@ const Learn = () => {
       description: "Strategic tax optimization techniques for professionals",
       duration: "6 weeks",
       level: "Advanced",
-      progress: 0, // Changed from 35 to 0
+      progress: 35,
       modules: ["Investment Tax", "Estate Planning", "International Tax", "Business Tax"],
       icon: <FaVideo />
     }
@@ -277,140 +276,143 @@ const Learn = () => {
         <p>Master tax fundamentals and advanced strategies through our comprehensive courses</p>
       </div>
 
-      <div className="learn-navigation">
-        <div className="tabs-wrapper">
-          {[
-            { id: 'courses', icon: <FaVideo />, label: 'Courses' },
-            { id: 'quiz', icon: <FaQuestionCircle />, label: 'Practice Quiz' },
-            { id: 'certificates', icon: <FaCertificate />, label: 'Certificates' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.icon}
-              <span>{tab.label}</span>
-            </button>
-          ))}
+      {/* Learning sections with lock effect */}
+      <div className={`learning-content ${!auth.currentUser ? 'locked' : ''}`}>
+        <div className="learn-navigation">
+          <div className="tabs-wrapper">
+            {[
+              { id: 'courses', icon: <FaVideo />, label: 'Courses' },
+              { id: 'quiz', icon: <FaQuestionCircle />, label: 'Practice Quiz' },
+              { id: 'certificates', icon: <FaCertificate />, label: 'Certificates' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="learn-content">
-        {activeTab === 'courses' && (
-          <div className="courses-grid">
-            {courses.map((course, index) => (
-              <div
-                key={course.id}
-                className="course-card slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="course-icon">{course.icon}</div>
-                <h3>{course.title}</h3>
-                <p>{course.description}</p>
-                <div className="course-meta">
-                  <span className="duration">{course.duration}</span>
-                  <span className={`level ${course.level.toLowerCase()}`}>
-                    {course.level}
-                  </span>
-                </div>
-                <div className="modules-list">
-                  {course.modules.map((module, i) => (
-                    <div key={i} className="module-item">
-                      <span className="module-dot"></span>
-                      {module}
-                    </div>
-                  ))}
-                </div>
-                <div className="progress-container">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${course.progress}%` }}></div>
-                  </div>
-                  <span className="progress-text">{course.progress}% Complete</span>
-                </div>
-                <button className="start-course-btn glow" onClick={() => handleStartCourse(course.id)}>
-                  {course.progress > 0 ? 'Continue Course' : 'Start Course'}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === 'quiz' && (
-          <div className="quiz-grid">
-            {quizzes.map((quiz, index) => (
-              <div
-                key={quiz.id}
-                className="quiz-card slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <h3>{quiz.title}</h3>
-                <p>{quiz.description}</p>
-                <div className="quiz-meta">
-                  <span>{quiz.questions} Questions</span>
-                  <span>{quiz.duration}</span>
-                  <span className={`difficulty ${quiz.difficulty.toLowerCase()}`}>
-                    {quiz.difficulty}
-                  </span>
-                </div>
-                <div className="topics-list">
-                  {quiz.topics.map((topic, i) => (
-                    <span key={i} className="topic-tag">{topic}</span>
-                  ))}
-                </div>
-                <button 
-                  className="start-quiz-button glow"
-                  onClick={() => setShowQuiz(true)}
+        <div className="learn-content">
+          {activeTab === 'courses' && (
+            <div className="courses-grid">
+              {courses.map((course, index) => (
+                <div
+                  key={course.id}
+                  className="course-card slide-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  Take Quiz
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {showQuiz && <Quiz onClose={() => setShowQuiz(false)} />}
-
-        {activeTab === 'certificates' && (
-          <div className="certificates-grid">
-            {certificates.map((cert, index) => (
-              <div
-                key={cert.id}
-                className="certificate-card slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="certificate-badge">{cert.badge}</div>
-                <h3>{cert.title}</h3>
-                <div className="certificate-meta">
-                  <div className={`status ${cert.status.toLowerCase().replace(' ', '-')}`}>
-                    {cert.status}
+                  <div className="course-icon">{course.icon}</div>
+                  <h3>{course.title}</h3>
+                  <p>{course.description}</p>
+                  <div className="course-meta">
+                    <span className="duration">{course.duration}</span>
+                    <span className={`level ${course.level.toLowerCase()}`}>
+                      {course.level}
+                    </span>
                   </div>
-                  {cert.progress && (
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: cert.progress }}></div>
-                      <span>{cert.progress}</span>
-                    </div>
-                  )}
-                  {cert.validUntil && (
-                    <div className="valid-until">Valid until: {cert.validUntil}</div>
-                  )}
-                </div>
-                {cert.requirements && (
-                  <div className="requirements-list">
-                    {cert.requirements.map((req, i) => (
-                      <div key={i} className="requirement-item">
-                        <span className="requirement-dot"></span>
-                        {req}
+                  <div className="modules-list">
+                    {course.modules.map((module, i) => (
+                      <div key={i} className="module-item">
+                        <span className="module-dot"></span>
+                        {module}
                       </div>
                     ))}
                   </div>
-                )}
-                <button className="certificate-action-button glow">
-                  {cert.status === 'Completed' ? 'View Certificate' : 
-                   cert.status === 'In Progress' ? 'Continue' : 'Start Certification'}
-                </button>
-              </div>
-            ))}
+                  <div className="progress-container">
+                    <div className="progress-bar">
+                      <div className="progress-fill" style={{ width: `${course.progress}%` }}></div>
+                    </div>
+                    <span className="progress-text">{course.progress}% Complete</span>
+                  </div>
+                  <button className="start-course-btn glow" onClick={() => handleStartCourse(course.id)}>
+                    {course.progress > 0 ? 'Continue Course' : 'Start Course'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'quiz' && (
+            <div className="quiz-grid">
+              {quizzes.map((quiz, index) => (
+                <div
+                  key={quiz.id}
+                  className="quiz-card slide-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <h3>{quiz.title}</h3>
+                  <p>{quiz.description}</p>
+                  <div className="quiz-meta">
+                    <span>{quiz.questions} Questions</span>
+                    <span>{quiz.duration}</span>
+                    <span className={`difficulty ${quiz.difficulty.toLowerCase()}`}>
+                      {quiz.difficulty}
+                    </span>
+                  </div>
+                  <div className="topics-list">
+                    {quiz.topics.map((topic, i) => (
+                      <span key={i} className="topic-tag">{topic}</span>
+                    ))}
+                  </div>
+                  <button className="start-quiz-button glow">Take Quiz</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'certificates' && (
+            <div className="certificates-grid">
+              {certificates.map((cert, index) => (
+                <div
+                  key={cert.id}
+                  className="certificate-card slide-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="certificate-badge">{cert.badge}</div>
+                  <h3>{cert.title}</h3>
+                  <div className="certificate-meta">
+                    <div className={`status ${cert.status.toLowerCase().replace(' ', '-')}`}>
+                      {cert.status}
+                    </div>
+                    {cert.progress && (
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: cert.progress }}></div>
+                        <span>{cert.progress}</span>
+                      </div>
+                    )}
+                    {cert.validUntil && (
+                      <div className="valid-until">Valid until: {cert.validUntil}</div>
+                    )}
+                  </div>
+                  {cert.requirements && (
+                    <div className="requirements-list">
+                      {cert.requirements.map((req, i) => (
+                        <div key={i} className="requirement-item">
+                          <span className="requirement-dot"></span>
+                          {req}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <button className="certificate-action-button glow">
+                    {cert.status === 'Completed' ? 'View Certificate' : 
+                     cert.status === 'In Progress' ? 'Continue' : 'Start Certification'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {!auth.currentUser && (
+          <div className="lock-overlay">
+            <FaLock className="lock-icon" />
+            <p>Sign in to access learning resources</p>
           </div>
         )}
       </div>

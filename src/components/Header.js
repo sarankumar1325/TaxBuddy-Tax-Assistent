@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSun, FaMoon, FaBars, FaTimes, FaBell, FaCog, FaUser, FaUsers } from 'react-icons/fa';
+import { FaSun, FaMoon, FaBars, FaTimes, FaBell, FaCog, FaUser, FaUsers, FaSignOutAlt } from 'react-icons/fa';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import '../styles/Header.css';
@@ -18,12 +18,14 @@ const Header = ({ theme, toggleTheme, isLoggedIn, setIsLoggedIn }) => {
   };
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setIsLoggedIn(false);
-      navigate('/login');
-    } catch (error) {
-      console.error('Error signing out:', error);
+    if (window.confirm('Are you sure you want to logout?')) {
+      try {
+        await signOut(auth);
+        setIsLoggedIn(false);
+        navigate('/login');
+      } catch (error) {
+        console.error('Error signing out:', error);
+      }
     }
   };
 
@@ -76,6 +78,7 @@ const Header = ({ theme, toggleTheme, isLoggedIn, setIsLoggedIn }) => {
           <div className="auth-group" style={{ display: 'flex', gap: '0.5rem' }}>
             {isLoggedIn ? (
               <button onClick={handleLogout} className="auth-link logout-btn">
+                <FaSignOutAlt size={16} style={{ marginRight: '6px' }} />
                 Logout
               </button>
             ) : (
