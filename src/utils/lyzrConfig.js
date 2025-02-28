@@ -1,4 +1,4 @@
-const LYZR_API_KEY = 'sk-default-6wSSyJrvP07A6C7X0oR2lls3NbO28SIU';
+const LYZR_API_KEY = 'sk-default-MocEmPJWyTmFsDOBdse7UIP3dIanvGaP';
 const LYZR_API_URL = 'https://agent-prod.studio.lyzr.ai/v3/inference/chat/';
 
 export const createLyzrCompletion = async (prompt, pdfContent) => {
