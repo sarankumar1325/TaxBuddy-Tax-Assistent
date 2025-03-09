@@ -1,3 +1,7 @@
+# TaxBuddy-Tax-Assistent
+![Image](https://github.com/user-attachments/assets/0f22441b-9fb1-48c5-8f8b-1c7d83820c6c)
+![Image](https://github.com/user-attachments/assets/3335a177-eace-45f0-83e1-f95c6513587f)
+![Image](https://github.com/user-attachments/assets/ec737201-59b0-4c13-845b-4bfbeb23e97e)
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
