@@ -1212,7 +1212,6 @@
   letter-spacing: -0.02em;
 }
 
-/* Enhanced Chart Card Styling */
 .chart-card {
   min-width: 400px;
   background: var(--card-bg);

@@ -25,6 +25,9 @@ export const createLyzrCompletion = async (prompt, pdfContent) => {
     return data.response || 'No response from the agent';
   } catch (error) {
     console.error('Lyzr API Error:', error);
+
+
+    
     throw new Error(error.message || 'Failed to get response from Lyzr AI');
   }
 };
